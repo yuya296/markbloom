@@ -33,7 +33,7 @@
     "eslint": "^9.39.2",
     "globals": "^17.3.0",
     "postcss-scss": "^4.0.9",
-    "stylelint": "^16.25.0",
+    "stylelint": "^17.4.0",
     "tsup": "^8.5.0",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.0"
