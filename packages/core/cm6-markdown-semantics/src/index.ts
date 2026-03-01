@@ -80,7 +80,7 @@ function addLineClass(lineFrom: number, className: string, lineClasses: Map<numb
   set.add(className);
 }
 
-function slugifyHeading(text: string): string {
+export function slugifyHeading(text: string): string {
   return text
     .trim()
     .toLowerCase()
@@ -89,9 +89,13 @@ function slugifyHeading(text: string): string {
     .replace(/-+/g, "-");
 }
 
+export function stripHeadingMarkers(raw: string): string {
+  return raw.replace(/^\s{0,3}#{1,6}\s+/, "").replace(/\s+#*\s*$/, "");
+}
+
 function extractHeadingText(view: EditorView, from: number, to: number): string {
   const raw = view.state.doc.sliceString(from, to);
-  return raw.replace(/^\s{0,3}#{1,6}\s+/, "").replace(/\s+#*\s*$/, "");
+  return stripHeadingMarkers(raw);
 }
 
 function findLinkTargetNode(node: SyntaxNode): SyntaxNode | null {
@@ -111,6 +115,18 @@ function findLinkTargetNode(node: SyntaxNode): SyntaxNode | null {
   return null;
 }
 
+export function extractLinkHrefFromText(raw: string): string | null {
+  const autolinkMatch = raw.match(/<([^>]+)>/);
+  if (autolinkMatch) {
+    return autolinkMatch[1].trim() || null;
+  }
+  const linkMatch = raw.match(/\(([^)]+)\)/);
+  if (linkMatch) {
+    return linkMatch[1].trim() || null;
+  }
+  return null;
+}
+
 function extractLinkHref(view: EditorView, node: SyntaxNode): string | null {
   const targetNode = findLinkTargetNode(node);
   if (targetNode) {
@@ -122,15 +138,7 @@ function extractLinkHref(view: EditorView, node: SyntaxNode): string | null {
   }
 
   const raw = view.state.doc.sliceString(node.from, node.to);
-  const autolinkMatch = raw.match(/<([^>]+)>/);
-  if (autolinkMatch) {
-    return autolinkMatch[1].trim() || null;
-  }
-  const linkMatch = raw.match(/\(([^)]+)\)/);
-  if (linkMatch) {
-    return linkMatch[1].trim() || null;
-  }
-  return null;
+  return extractLinkHrefFromText(raw);
 }
 
 function addCodeBlockClasses(
@@ -177,9 +185,9 @@ function addLineLevelForNode(
   }
 }
 
-function getListLevel(node: SyntaxNode): number {
+export function getListLevel(node: SyntaxNode | null | undefined): number {
   let level = 0;
-  for (let current = node.parent; current; current = current.parent) {
+  for (let current = node?.parent; current; current = current.parent) {
     if (current.name === "BulletList" || current.name === "OrderedList") {
       level += 1;
     }
@@ -187,9 +195,9 @@ function getListLevel(node: SyntaxNode): number {
   return level;
 }
 
-function getBlockquoteLevel(node: SyntaxNode): number {
+export function getBlockquoteLevel(node: SyntaxNode | null | undefined): number {
   let level = 0;
-  for (let current: SyntaxNode | null = node; current; current = current.parent) {
+  for (let current: SyntaxNode | null | undefined = node; current; current = current.parent) {
     if (current.name === "Blockquote") {
       level += 1;
     }
@@ -197,13 +205,17 @@ function getBlockquoteLevel(node: SyntaxNode): number {
   return level;
 }
 
-function getTaskStateClass(view: EditorView, from: number, to: number, prefix: string): string | null {
-  const sample = view.state.doc.sliceString(from, Math.min(to, from + 6));
+export function getTaskStateClassFromText(sample: string, prefix: string): string | null {
   const match = sample.match(/^\[( |x|X)\]/);
   if (!match) {
     return null;
   }
   return match[1].toLowerCase() === "x" ? `${prefix}task-checked` : `${prefix}task-unchecked`;
+}
+
+function getTaskStateClass(view: EditorView, from: number, to: number, prefix: string): string | null {
+  const sample = view.state.doc.sliceString(from, Math.min(to, from + 6));
+  return getTaskStateClassFromText(sample, prefix);
 }
 
 function buildDecorations(view: EditorView, prefix: string): DecorationSet {
