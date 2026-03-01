@@ -35,6 +35,14 @@ import {
   toDisplayText,
   toMarkdownText,
 } from "./tableMarkdown";
+import {
+  collectTableBoundaries,
+  collectTableData,
+  collectTableLines,
+  createTableKey,
+  isLikelyTableBoundaryCandidateLine,
+  type TableBoundaryInfo,
+} from "./tableDetection";
 
 export type { TableAlignment, TableData };
 
@@ -91,13 +99,6 @@ type ColumnDropMarker =
       side: "before" | "after";
     }
   | null;
-
-type TableBoundaryInfo = {
-  key: string;
-  startLineNumber: number;
-  endLineNumber: number;
-  totalRows: number;
-};
 
 type FocusCellRequest = {
   row: number;
@@ -1847,106 +1848,6 @@ function dispatchOutsideTransaction(
     view.scrollDOM.scrollTop = scrollTop;
     view.scrollDOM.scrollLeft = scrollLeft;
   });
-}
-
-function hashString(value: string): string {
-  let hash = 2166136261;
-  for (let i = 0; i < value.length; i += 1) {
-    hash ^= value.charCodeAt(i);
-    hash = Math.imul(hash, 16777619);
-  }
-  return (hash >>> 0).toString(36);
-}
-
-function createTableKey(lines: ReturnType<typeof collectTableLines>): string {
-  const first = lines[0];
-  const last = lines[lines.length - 1];
-  const signature = lines.map((line) => line.text).join("\n");
-  return `${first.from}-${last.to}-${hashString(signature)}`;
-}
-
-function collectTableBoundaries(state: EditorState): TableBoundaryInfo[] {
-  const tables: TableBoundaryInfo[] = [];
-
-  syntaxTree(state).iterate({
-    enter: (node) => {
-      if (node.name !== "Table") {
-        return;
-      }
-      const lines = collectTableLines(state, node.from, node.to);
-      if (lines.length === 0) {
-        return;
-      }
-      const data = collectTableData(state, node.node, lines);
-      tables.push({
-        key: createTableKey(lines),
-        startLineNumber: lines[0].number,
-        endLineNumber: lines[lines.length - 1].number,
-        totalRows: data.rows.length + 1,
-      });
-    },
-  });
-
-  return tables;
-}
-
-function isLikelyTableBoundaryCandidateLine(lineText: string): boolean {
-  const text = lineText.trim();
-  if (text.length === 0 || !text.includes("|")) {
-    return false;
-  }
-  if (/^\|?[-:\s]+(\|[-:\s]+)+\|?$/u.test(text)) {
-    return true;
-  }
-  return /^\|.*\|$/u.test(text);
-}
-
-function collectTableData(
-  state: EditorState,
-  node: SyntaxNode,
-  lines: ReturnType<typeof collectTableLines>
-): TableData {
-  const headerNode = node.getChild("TableHeader");
-  const rowNodes = node.getChildren("TableRow");
-  const header = headerNode ? { cells: collectCells(state, headerNode) } : null;
-  const rows = rowNodes.map((row) => ({ cells: collectCells(state, row) }));
-  const columnCount = Math.max(
-    header?.cells.length ?? 0,
-    ...rows.map((row) => row.cells.length),
-    0
-  );
-  const alignments = parseAlignmentsFromLines(lines.map((line) => line.text), columnCount);
-  return { header, rows, alignments };
-}
-
-function collectTableLines(state: EditorState, from: number, to: number) {
-  const lines = [];
-  const startLine = state.doc.lineAt(from);
-  const endLine = state.doc.lineAt(Math.max(from, to - 1));
-  for (let lineNumber = startLine.number; lineNumber <= endLine.number; lineNumber += 1) {
-    lines.push(state.doc.line(lineNumber));
-  }
-  while (lines.length > 0 && lines[lines.length - 1].text.trim() === "") {
-    lines.pop();
-  }
-  return lines;
-}
-
-function collectCells(
-  state: EditorState,
-  rowNode: SyntaxNode
-): Array<{ text: string; from: number; to: number }> {
-  const cells: Array<{ text: string; from: number; to: number }> = [];
-  for (let child = rowNode.firstChild; child; child = child.nextSibling) {
-    if (child.name === "TableCell") {
-      cells.push({
-        text: state.doc.sliceString(child.from, child.to).trim(),
-        from: child.from,
-        to: child.to,
-      });
-    }
-  }
-  return cells;
 }
 
 function buildDecorations(
