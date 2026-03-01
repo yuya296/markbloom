@@ -30,6 +30,12 @@ import {
   normalizeTableData,
 } from "./tableModel";
 import {
+  buildTableCommitChange,
+  clampCellSelection,
+  getTableCellText,
+  setTableCellText,
+} from "./tableEditing";
+import {
   buildTableMarkdown,
   parseAlignmentsFromLines,
   toDisplayText,
@@ -272,36 +278,16 @@ class TableWidget extends WidgetType {
     };
 
     const clampCell = (nextRow: number, nextCol: number): CellSelection => {
-      const row = Math.min(Math.max(nextRow, 0), getTotalRows() - 1);
-      const col = Math.min(Math.max(nextCol, 0), columnCount - 1);
-      return { kind: "cell", row, col };
+      return {
+        kind: "cell",
+        ...clampCellSelection(nextRow, nextCol, getTotalRows(), columnCount),
+      };
     };
 
-    const getCellText = (cell: CellSelection): string => {
-      if (cell.row === 0) {
-        return data.header?.cells[cell.col]?.text ?? "";
-      }
-      return data.rows[cell.row - 1]?.cells[cell.col]?.text ?? "";
-    };
+    const getCellText = (cell: CellSelection): string => getTableCellText(data, cell);
 
     const setCellText = (cell: CellSelection, value: string) => {
-      if (cell.row === 0) {
-        if (data.header) {
-          data.header.cells[cell.col] = {
-            ...(data.header.cells[cell.col] ?? { from: -1, to: -1 }),
-            text: value,
-          };
-        }
-        return;
-      }
-      const targetRow = data.rows[cell.row - 1];
-      if (!targetRow) {
-        return;
-      }
-      targetRow.cells[cell.col] = {
-        ...(targetRow.cells[cell.col] ?? { from: -1, to: -1 }),
-        text: value,
-      };
+      setTableCellText(data, cell, value);
     };
 
     const updateCellDisplay = (cell: CellSelection) => {
@@ -317,27 +303,14 @@ class TableWidget extends WidgetType {
     };
 
     const dispatchCommit = () => {
-      normalizeTableData(data);
-      const doc = view.state.doc;
-      const startLine = doc.line(this.tableInfo.startLineNumber);
-      const endLine = doc.line(this.tableInfo.endLineNumber);
-      const startLineFrom = startLine.from;
-      const endLineTo = endLine.to;
-      let suffix = "";
-      for (let pos = endLineTo; pos < doc.length; pos += 1) {
-        const char = doc.sliceString(pos, pos + 1);
-        if (char !== "\n") {
-          break;
-        }
-        suffix += "\n";
-      }
-      const markdown = `${buildTableMarkdown(data)}${suffix}`;
+      const changes = buildTableCommitChange(
+        view.state,
+        data,
+        this.tableInfo.startLineNumber,
+        this.tableInfo.endLineNumber
+      );
       dispatchOutsideUpdate(view, {
-        changes: {
-          from: startLineFrom,
-          to: endLineTo + suffix.length,
-          insert: markdown,
-        },
+        changes,
         annotations: tableEditAnnotation.of(true),
       });
     };
