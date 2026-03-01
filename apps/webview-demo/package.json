@@ -19,7 +19,7 @@
     "@codemirror/language": "^6.12.1",
     "@codemirror/language-data": "^6.5.2",
     "@codemirror/state": "^6.5.3",
-    "@codemirror/view": "^6.39.8",
+    "@codemirror/view": "^6.39.15",
     "@lezer/highlight": "^1.2.3",
     "@lezer/markdown": "^1.6.2",
     "@yuya296/cm6-diff-gutter": "workspace:*",

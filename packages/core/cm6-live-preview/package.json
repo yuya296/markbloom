@@ -44,13 +44,13 @@
     "@codemirror/lang-markdown": "^6.5.0",
     "@codemirror/language": "^6.12.1",
     "@codemirror/state": "^6.5.3",
-    "@codemirror/view": "^6.39.8"
+    "@codemirror/view": "^6.39.15"
   },
   "devDependencies": {
     "@codemirror/lang-markdown": "^6.5.0",
     "@codemirror/language": "^6.12.1",
     "@codemirror/state": "^6.5.3",
-    "@codemirror/view": "^6.39.8",
+    "@codemirror/view": "^6.39.15",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3"
   }
