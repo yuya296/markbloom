@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="data:," />
+    <title>webview-demo</title>
+    <script type="module" crossorigin src="/MarkBloom/pr-63/assets/index-B1rQuYXb.js"></script>
+    <link rel="stylesheet" crossorigin href="/MarkBloom/pr-63/assets/index-Dm33KIwo.css">
+  </head>
+  <body>
+    <div id="app">
+      <div class="top-controls">
+        <button id="toggle-theme" class="icon-button" type="button" aria-label="Toggle theme">
+          <span class="icon material-symbols-outlined" data-icon="sun" aria-hidden="true">
+            light_mode
+          </span>
+          <span class="icon material-symbols-outlined" data-icon="moon" aria-hidden="true">
+            dark_mode
+          </span>
+        </button>
+        <details id="settings-menu" class="settings-menu">
+          <summary class="icon-button" aria-label="Open settings">
+            <span class="icon material-symbols-outlined" data-icon="gear" aria-hidden="true">
+              settings
+            </span>
+          </summary>
+          <div class="settings-panel" role="menu">
+            <label class="control-item">
+              <input id="toggle-line-numbers" type="checkbox" />
+              Line numbers
+            </label>
+            <label class="control-item">
+              <input id="toggle-wrap" type="checkbox" checked />
+              Line wrapping
+            </label>
+            <label class="control-item">
+              <input id="toggle-live-preview" type="checkbox" checked />
+              Live preview
+            </label>
+            <label class="control-item">
+              <input id="toggle-block-reveal" type="checkbox" checked />
+              Block reveal
+            </label>
+            <label class="control-item">
+              Tab size
+              <input id="tab-size" type="number" min="2" max="8" value="4" />
+            </label>
+            <button id="apply" type="button">Apply</button>
+          </div>
+        </details>
+      </div>
+      <main>
+        <div id="editor" class="editor"></div>
+      </main>
+      <footer class="footer">
+        <span id="change-info">No changes yet.</span>
+      </footer>
+    </div>
+  </body>
+</html>
