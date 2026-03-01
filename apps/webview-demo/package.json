@@ -27,7 +27,7 @@
     "@yuya296/cm6-markdown-smart-bol": "workspace:*"
   },
   "devDependencies": {
-    "sass": "^1.97.1",
+    "sass": "^1.97.3",
     "vite": "^7.3.0"
   }
 }
