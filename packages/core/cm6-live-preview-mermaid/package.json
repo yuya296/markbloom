@@ -52,7 +52,7 @@
     "@codemirror/state": "^6.5.3",
     "@codemirror/view": "^6.39.15",
     "@yuya296/cm6-live-preview-core": "workspace:*",
-    "jsdom": "^26.1.0",
+    "jsdom": "^28.1.0",
     "tsx": "^4.20.5",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3"

@@ -48,7 +48,7 @@
     "@codemirror/state": "^6.5.3",
     "@codemirror/view": "^6.39.15",
     "@lezer/markdown": "^1.6.2",
-    "jsdom": "^26.1.0",
+    "jsdom": "^28.1.0",
     "tsup": "^8.5.1",
     "tsx": "^4.20.5",
     "typescript": "^5.9.3"
