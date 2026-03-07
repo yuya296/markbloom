@@ -17,13 +17,27 @@
             dark_mode
           </span>
         </button>
-        <details id="settings-menu" class="settings-menu">
-          <summary class="icon-button" aria-label="Open settings">
+        <div class="settings-menu">
+          <button
+            id="settings-toggle"
+            class="icon-button"
+            type="button"
+            aria-label="Open settings"
+            aria-haspopup="dialog"
+            aria-controls="settings-panel"
+            aria-expanded="false"
+          >
             <span class="icon material-symbols-outlined" data-icon="gear" aria-hidden="true">
               settings
             </span>
-          </summary>
-          <div class="settings-panel" role="menu">
+          </button>
+          <div
+            id="settings-panel"
+            class="settings-panel"
+            role="dialog"
+            aria-label="Editor settings"
+            hidden
+          >
             <label class="control-item">
               <input id="toggle-line-numbers" type="checkbox" />
               Line numbers
@@ -46,7 +60,7 @@
             </label>
             <button id="apply" type="button">Apply</button>
           </div>
-        </details>
+        </div>
       </div>
       <main>
         <div id="editor" class="editor"></div>
