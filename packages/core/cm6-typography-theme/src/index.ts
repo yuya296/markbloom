@@ -11,7 +11,6 @@ export type TypographyThemeOptions = {
 
 export type TypographyThemeSpec = Record<string, Record<string, string>>;
 
-/** @internal */
 export function buildTypographyThemeSpec(
   options: TypographyThemeOptions = {}
 ): TypographyThemeSpec {

@@ -21,19 +21,16 @@ export type LivePreviewPresetOptions = {
   table?: TablePresetOption;
 };
 
-/** @internal */
 export function resolveMermaidPresetOptions(
   mermaid?: MermaidPresetOption
 ): MermaidLivePreviewPluginOptions | null {
   return mermaid === true ? {} : mermaid && typeof mermaid === "object" ? mermaid : null;
 }
 
-/** @internal */
 export function resolveTablePresetOptions(table?: TablePresetOption): TableEditorOptions | null {
   return table === true ? {} : table && typeof table === "object" ? table : null;
 }
 
-/** @internal */
 export function resolvePresetLivePreviewOptions(
   livePreviewOptions: false | LivePreviewOptions | undefined,
   extraPlugins: readonly LivePreviewPlugin[] = []
