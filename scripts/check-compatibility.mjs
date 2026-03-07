@@ -99,7 +99,7 @@ function validateCoreRangeForApp({ appName, required = false }) {
 
 const results = [
   validateCoreRangeForApp({ appName: "vscode", required: true }),
-  validateCoreRangeForApp({ appName: "mac", required: false }),
+  validateCoreRangeForApp({ appName: "mac", required: true }),
 ].filter(Boolean);
 
 const rendered = results

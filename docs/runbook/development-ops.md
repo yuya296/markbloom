@@ -63,7 +63,7 @@
 ## 互換性契約
 - 正本: `releases/compatibility-matrix.json`
 - 現在は `vscode -> core` と `mac -> core` の min/max 範囲を CI で検証
-- `mac` を reserved に戻す場合は `apps.mac.status = \"reserved\"` に設定する
+- `mac` を reserved に戻す場合は `apps.mac.status = "reserved"` に設定する
 
 ## mac app 運用補足
 - v1 はローカル配布のみ（署名 / Notarization / Auto Update なし）。
