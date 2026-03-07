@@ -9,7 +9,11 @@ export type TypographyThemeOptions = {
   listOrderedColor?: string;
 };
 
-export function typographyTheme(options: TypographyThemeOptions = {}): Extension {
+export type TypographyThemeSpec = Record<string, Record<string, string>>;
+
+export function buildTypographyThemeSpec(
+  options: TypographyThemeOptions = {}
+): TypographyThemeSpec {
   const prefix = options.classPrefix ?? "mb-";
   const scope = ".cm-content";
   const listMarkerWidthCh = `${options.listMarkerWidthCh ?? 1.5}ch`;
@@ -17,7 +21,7 @@ export function typographyTheme(options: TypographyThemeOptions = {}): Extension
   const listBulletColor = options.listBulletColor ?? "var(--editor-primary-color, currentColor)";
   const listOrderedColor = options.listOrderedColor ?? "var(--editor-secondary-color, currentColor)";
 
-  return EditorView.theme({
+  return {
     [`${scope}`]: {
       "--mb-list-marker-width-ch": listMarkerWidthCh,
       "--mb-list-indent-step-ch": listIndentStepCh,
@@ -246,5 +250,9 @@ export function typographyTheme(options: TypographyThemeOptions = {}): Extension
     [`${scope} .${prefix}list-item-level-4`]: { "--mb-list-level": "4" },
     [`${scope} .${prefix}list-item-level-5`]: { "--mb-list-level": "5" },
     [`${scope} .${prefix}list-item-level-6`]: { "--mb-list-level": "6" },
-  });
+  };
+}
+
+export function typographyTheme(options: TypographyThemeOptions = {}): Extension {
+  return EditorView.theme(buildTypographyThemeSpec(options));
 }
