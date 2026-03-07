@@ -31,7 +31,8 @@
   "scripts": {
     "build": "tsup src/index.ts --format esm --dts --out-dir dist --clean",
     "lint": "eslint src --max-warnings 0",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "tsx --test tests/*.test.ts"
   },
   "dependencies": {
     "@yuya296/cm6-live-preview-core": "workspace:*",
@@ -51,6 +52,7 @@
     "@codemirror/language": "^6.12.1",
     "@codemirror/state": "^6.5.3",
     "@codemirror/view": "^6.39.15",
+    "tsx": "^4.21.0",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3"
   }
