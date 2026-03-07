@@ -4,17 +4,13 @@ import initialText from "../assets/sample.md?raw";
 import { diffGutter } from "@yuya296/cm6-diff-gutter";
 import { livePreviewPreset, resolveImageBasePath } from "@yuya296/cm6-live-preview";
 import { createEditor } from "./createEditor";
+import {
+  type ExtensionOptions,
+  readExtensionOptionsFromControls,
+} from "./editorSettings";
 import { editorTheme } from "./editorTheme";
 import { editorHighlightStyle } from "./editorHighlightStyle";
-
-type ExtensionOptions = {
-  showLineNumbers: boolean;
-  wrapLines: boolean;
-  tabSize: number;
-  livePreviewEnabled: boolean;
-  blockRevealEnabled: boolean;
-  diffBaselineText: string;
-};
+import { resolveMermaidPreviewEnabled, resolvePreviewFeatureFlags } from "./featureFlags";
 
 function isTableLine(lineText: string): boolean {
   const line = lineText.trim();
@@ -36,6 +32,7 @@ function buildExtensions({
   diffBaselineText,
 }: ExtensionOptions): Extension[] {
   const extensions: Extension[] = [];
+  const previewFeatureFlags = resolvePreviewFeatureFlags();
 
   extensions.push(
     diffGutter({
@@ -68,8 +65,11 @@ function buildExtensions({
             imageRawShowsPreview: true,
           }
         : false,
-      // Temporarily disable Mermaid preview due to instability.
-      mermaid: false,
+      // Mermaid is paused for now. Re-enable by flipping the feature flag.
+      mermaid: resolveMermaidPreviewEnabled({
+        livePreviewEnabled,
+        featureFlags: previewFeatureFlags,
+      }),
       table: true,
     })
   );
@@ -94,7 +94,8 @@ export function setupApp() {
     themeToggle: document.getElementById("toggle-theme"),
     tabSize: document.getElementById("tab-size"),
     apply: document.getElementById("apply"),
-    settingsMenu: document.getElementById("settings-menu"),
+    settingsToggle: document.getElementById("settings-toggle"),
+    settingsPanel: document.getElementById("settings-panel"),
   };
 
   if (
@@ -104,7 +105,9 @@ export function setupApp() {
     !(controls.blockReveal instanceof HTMLInputElement) ||
     !(controls.themeToggle instanceof HTMLButtonElement) ||
     !(controls.tabSize instanceof HTMLInputElement) ||
-    !(controls.apply instanceof HTMLButtonElement)
+    !(controls.apply instanceof HTMLButtonElement) ||
+    !(controls.settingsToggle instanceof HTMLButtonElement) ||
+    !(controls.settingsPanel instanceof HTMLDivElement)
   ) {
     throw new Error("Missing control elements");
   }
@@ -116,7 +119,35 @@ export function setupApp() {
   const themeToggleControl = controls.themeToggle;
   const tabSizeControl = controls.tabSize;
   const applyControl = controls.apply;
-  const settingsMenu = controls.settingsMenu;
+  const settingsToggleControl = controls.settingsToggle;
+  const settingsPanelControl = controls.settingsPanel;
+
+  const setSettingsMenuOpen = (open: boolean) => {
+    settingsToggleControl.setAttribute("aria-expanded", open ? "true" : "false");
+    settingsPanelControl.hidden = !open;
+  };
+
+  const isSettingsMenuOpen = () =>
+    settingsToggleControl.getAttribute("aria-expanded") === "true";
+
+  const syncTabSizeControl = (nextValue: string) => {
+    if (tabSizeControl.value !== nextValue) {
+      tabSizeControl.value = nextValue;
+    }
+  };
+
+  const getExtensionOptions = (): ExtensionOptions => {
+    const nextOptions = readExtensionOptionsFromControls({
+      showLineNumbers: lineNumbersControl.checked,
+      wrapLines: wrapControl.checked,
+      livePreviewEnabled: livePreviewControl.checked,
+      blockRevealEnabled: blockRevealControl.checked,
+      tabSizeInput: tabSizeControl.value,
+      diffBaselineText: initialText,
+    });
+    syncTabSizeControl(nextOptions.normalizedTabSizeInput);
+    return nextOptions;
+  };
 
   const setTheme = (nextTheme: "light" | "dark") => {
     document.documentElement.dataset.theme = nextTheme;
@@ -129,6 +160,7 @@ export function setupApp() {
   const prefersDark =
     window.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
   setTheme(prefersDark ? "dark" : "light");
+  setSettingsMenuOpen(false);
 
   themeToggleControl.addEventListener("click", () => {
     const nextTheme =
@@ -136,17 +168,47 @@ export function setupApp() {
     setTheme(nextTheme);
   });
 
+  settingsToggleControl.addEventListener("click", () => {
+    const nextOpen = !isSettingsMenuOpen();
+    setSettingsMenuOpen(nextOpen);
+    if (nextOpen) {
+      lineNumbersControl.focus();
+    } else {
+      settingsToggleControl.focus();
+    }
+  });
+
+  settingsPanelControl.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") {
+      return;
+    }
+    event.preventDefault();
+    setSettingsMenuOpen(false);
+    settingsToggleControl.focus();
+  });
+
+  document.addEventListener("pointerdown", (event) => {
+    if (!isSettingsMenuOpen()) {
+      return;
+    }
+    if (!(event.target instanceof Node)) {
+      return;
+    }
+    if (
+      settingsPanelControl.contains(event.target) ||
+      settingsToggleControl.contains(event.target)
+    ) {
+      return;
+    }
+    event.preventDefault();
+    setSettingsMenuOpen(false);
+    settingsToggleControl.focus();
+  });
+
   const editor = createEditor({
     parent: editorHost,
     initialText,
-    extensions: buildExtensions({
-      showLineNumbers: lineNumbersControl.checked,
-      wrapLines: wrapControl.checked,
-      livePreviewEnabled: livePreviewControl.checked,
-      blockRevealEnabled: blockRevealControl.checked,
-      tabSize: Number(tabSizeControl.value),
-      diffBaselineText: initialText,
-    }),
+    extensions: buildExtensions(getExtensionOptions()),
     onChange: (text) => {
       if (status) {
         status.textContent = `Length: ${text.length}`;
@@ -158,19 +220,9 @@ export function setupApp() {
   });
 
   const applyExtensions = () => {
-    editor.setExtensions(
-      buildExtensions({
-        showLineNumbers: lineNumbersControl.checked,
-        wrapLines: wrapControl.checked,
-        livePreviewEnabled: livePreviewControl.checked,
-        blockRevealEnabled: blockRevealControl.checked,
-        tabSize: Number(tabSizeControl.value),
-        diffBaselineText: initialText,
-      })
-    );
-    if (settingsMenu instanceof HTMLDetailsElement) {
-      settingsMenu.open = false;
-    }
+    editor.setExtensions(buildExtensions(getExtensionOptions()));
+    setSettingsMenuOpen(false);
+    settingsToggleControl.focus();
   };
 
   applyControl.addEventListener("click", applyExtensions);

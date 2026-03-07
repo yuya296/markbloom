@@ -178,14 +178,6 @@ body {
   position: relative;
 }
 
-.settings-menu > summary {
-  list-style: none;
-}
-
-.settings-menu > summary::-webkit-details-marker {
-  display: none;
-}
-
 .settings-panel {
   position: absolute;
   right: 0;
@@ -202,7 +194,7 @@ body {
   z-index: 2;
 }
 
-.settings-menu:not([open]) .settings-panel {
+.settings-panel[hidden] {
   display: none;
 }
 
@@ -219,6 +211,7 @@ body {
   background: var(--app-input-bg);
   color: var(--app-text);
   border: 1px solid var(--app-input-border);
+  border-radius: 6px;
 }
 
 button#apply {
@@ -244,6 +237,11 @@ button#apply {
   color: var(--app-text);
   cursor: pointer;
   position: relative;
+}
+
+.icon-button[aria-expanded="true"] {
+  background: var(--app-pill-bg);
+  border-radius: 8px;
 }
 
 .icon-button .icon {

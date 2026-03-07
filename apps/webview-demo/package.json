@@ -10,6 +10,8 @@
     "dev": "node ../../scripts/ensure-node-version.mjs && vite",
     "build": "vite build",
     "preview": "vite preview",
+    "test": "pnpm run test:unit",
+    "test:unit": "node --experimental-transform-types --test tests/*.test.ts",
     "lint": "eslint src --max-warnings 0",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
@@ -21,7 +23,7 @@
     "@codemirror/state": "^6.5.3",
     "@codemirror/view": "^6.39.15",
     "@lezer/highlight": "^1.2.3",
-    "@lezer/markdown": "^1.6.2",
+    "@lezer/markdown": "^1.6.3",
     "@yuya296/cm6-diff-gutter": "workspace:*",
     "@yuya296/cm6-live-preview": "workspace:*",
     "@yuya296/cm6-markdown-smart-bol": "workspace:*"
