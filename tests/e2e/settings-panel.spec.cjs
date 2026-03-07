@@ -25,6 +25,22 @@ test("settings panel opens from a button and closes with escape", async ({ page 
   await expect(toggle).toBeFocused();
 });
 
+test("settings panel closes on outside click and restores focus to toggle", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await openSettings(page);
+
+  await page.locator("#tab-size").focus();
+  await page.dispatchEvent("#editor", "pointerdown");
+
+  const toggle = page.locator("#settings-toggle");
+  const panel = page.locator("#settings-panel");
+  await expect(toggle).toHaveAttribute("aria-expanded", "false");
+  await expect(panel).toBeHidden();
+  await expect(toggle).toBeFocused();
+});
+
 test("apply reflects line number and wrapping settings", async ({ page }) => {
   await page.goto("/");
   await openSettings(page);

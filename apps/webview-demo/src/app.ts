@@ -200,7 +200,9 @@ export function setupApp() {
     ) {
       return;
     }
+    event.preventDefault();
     setSettingsMenuOpen(false);
+    settingsToggleControl.focus();
   });
 
   const editor = createEditor({
