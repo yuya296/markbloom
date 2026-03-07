@@ -6,6 +6,7 @@
 | --- | --- |
 | `webview-demo` | CodeMirror6 のデモ（EditorState/EditorView/共通設定） |
 | `vscode-extension` | VS Code 拡張。Webview で CM6 + MarkBloom 拡張を組み合わせる |
+| `mac` | Tauri 2 ベースの mac ネイティブアプリ（Editor MVP） |
 | `cm6-live-preview-core` | Markdown記号の表示状態を動的に切り替える（syntax hide / secondary / raw） |
 | `cm6-live-preview-mermaid` | Live Preview pluginとして mermaid fenced code を図widget表示する |
 | `cm6-markdown-semantics` | Markdown要素を検出して範囲に semantic class を付与する |
@@ -21,7 +22,7 @@
 graph TD
   apps["apps/"] --> webviewDemo["webview-demo"]
   apps --> vscodeExtension["vscode-extension"]
-  apps --> macReserved["mac (reserved)"]
+  apps --> macApp["mac (tauri)"]
 
   core["packages/core/"] --> livePreview["cm6-live-preview"]
   core --> livePreviewCore["cm6-live-preview-core"]
@@ -45,6 +46,10 @@ graph TD
   vscode-extension --> cm6-diff-gutter
   vscode-extension --> cm6-markdown-smart-bol
 
+  mac --> cm6-live-preview
+  mac --> cm6-diff-gutter
+  mac --> cm6-markdown-smart-bol
+
   cm6-live-preview --> cm6-live-preview-core
   cm6-live-preview --> cm6-markdown-semantics
   cm6-live-preview --> cm6-typography-theme
@@ -67,8 +72,12 @@ graph TD
   vscodeWorkflow --> vscodeTag["vscode-vX.Y.Z tag"]
   vscodeWorkflow --> vscodeRelease["GitHub Release (vscode)"]
 
+  macApp["apps/mac"] --> macBuild["local tauri build"]
+  macBuild --> macBundle[".app (aarch64-apple-darwin)"]
+
   compatibility["releases/compatibility-matrix.json"] --> coreWorkflow
   compatibility --> vscodeWorkflow
+  compatibility --> macBuild
 ```
 
 ## Naming contract

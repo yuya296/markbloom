@@ -1,0 +1,21 @@
+[package]
+name = "markbloom-mac"
+version = "0.1.0"
+description = "MarkBloom mac app"
+authors = ["yuya296"]
+license = "MIT"
+repository = "https://github.com/yuya296/MarkBloom"
+edition = "2021"
+rust-version = "1.77.2"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+
+[profile.release]
+codegen-units = 1
+lto = true
+strip = true
+panic = "abort"

@@ -27,6 +27,7 @@ MarkBloom is a VS Code extension for **reviewing and editing Markdown** in a way
 
 - `apps/webview-demo`: integration demo app for CM6 + MarkBloom extensions
 - `apps/vscode-extension`: VS Code extension app (`markbloom`)
+- `apps/mac`: Tauri 2 based mac native app (`MarkBloom`)
 - `packages/core/cm6-*`: core CM6 libraries published to npm
 - `docs/`: architecture, runbook, ADR, and feature specs
 

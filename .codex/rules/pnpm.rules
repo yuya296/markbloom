@@ -22,6 +22,7 @@ prefix_rule(
         "list",
         "why",
         "outdated",
+        "test:e2e",
     ]],
     decision = "allow",
     justification = "Routine pnpm development and verification commands are allowed.",

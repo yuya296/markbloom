@@ -10,11 +10,11 @@
       }
     },
     "mac": {
-      "status": "reserved",
+      "status": "active",
       "supports": {
         "core": {
-          "min": null,
-          "max": null
+          "min": "0.1.0",
+          "max": "0.1.0"
         }
       }
     }

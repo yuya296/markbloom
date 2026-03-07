@@ -1,0 +1,36 @@
+{
+  "name": "markbloom-mac",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "node ../../scripts/ensure-node-version.mjs && vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src --max-warnings 0",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build --target aarch64-apple-darwin"
+  },
+  "dependencies": {
+    "@codemirror/commands": "^6.10.1",
+    "@codemirror/lang-markdown": "^6.5.0",
+    "@codemirror/language": "^6.12.1",
+    "@codemirror/language-data": "^6.5.2",
+    "@codemirror/state": "^6.5.3",
+    "@codemirror/view": "^6.39.15",
+    "@lezer/highlight": "^1.2.3",
+    "@lezer/markdown": "^1.6.3",
+    "@yuya296/cm6-diff-gutter": "workspace:*",
+    "@yuya296/cm6-live-preview": "workspace:*",
+    "@yuya296/cm6-markdown-smart-bol": "workspace:*"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.9.1",
+    "sass": "^1.97.3",
+    "vite": "^7.3.0"
+  }
+}

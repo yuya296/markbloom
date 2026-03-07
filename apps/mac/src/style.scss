@@ -1,0 +1,172 @@
+:root {
+  color-scheme: light;
+  font-family: "Noto Sans JP", "Noto Sans", "Yu Gothic", "YuGothic", "Hiragino Kaku Gothic ProN", "Hiragino Kaku Gothic Pro", sans-serif;
+  --app-bg: #fbfaf7;
+  --app-surface: #ffffff;
+  --app-text: #1f1e1c;
+  --app-muted: #6a6257;
+  --app-border: #e5e7eb;
+  --editor-primary-color: #0f5b9e;
+  --editor-secondary-color: #8f8a7f;
+  --editor-surface: #ffffff;
+  --editor-text-color: #1f1e1c;
+  --editor-gutter-bg: transparent;
+  --editor-gutter-color: #8f8a7f;
+  --editor-selection-bg: rgba(15, 91, 158, 0.2);
+  --editor-active-line-bg: rgba(15, 91, 158, 0.06);
+  --editor-active-line-gutter-bg: rgba(15, 91, 158, 0.08);
+  --editor-diff-added: rgba(46, 160, 67, 0.58);
+  --editor-diff-modified: rgba(210, 153, 34, 0.58);
+  --editor-diff-rail: rgba(106, 98, 87, 0.32);
+  --editor-caret-color: #0f5b9e;
+  --editor-checkbox-accent: var(--editor-primary-color);
+  --editor-checkbox-disabled-opacity: 0.55;
+  --mb-font-mono: "JetBrains Mono", "SF Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --mb-inline-code-bg: rgba(15, 91, 158, 0.08);
+  --mb-code-block-bg: #f2f2f2;
+  --mb-quote-border-color: #b9b1a4;
+  --mb-hr-color: #6a6257;
+  --mb-list-marker-bullet-color: #0f5b9e;
+  --mb-list-marker-ordered-color: #0f5b9e;
+  --mb-list-marker-width-ch: 1.5ch;
+  --mb-list-indent-step-ch: 2ch;
+  --syntax-comment: #6a737d;
+  --syntax-keyword: #d73a49;
+  --syntax-operator: #d73a49;
+  --syntax-string: #032f62;
+  --syntax-number: #005cc5;
+  --syntax-atom: #005cc5;
+  --syntax-function: #6f42c1;
+  --syntax-variable: #24292e;
+  --syntax-type: #6f42c1;
+  --syntax-property: #005cc5;
+  --syntax-tag: #22863a;
+  --syntax-link: #032f62;
+  --syntax-heading: #24292e;
+  --syntax-meta: #6a737d;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at 15% 10%, #ffffff, #fbfaf7 55%, #f4f2ec);
+  color: var(--app-text);
+}
+
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+main {
+  flex: 1;
+  max-width: 980px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.editor {
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  background: var(--app-surface);
+  min-height: calc(100vh - 100px);
+  width: 100%;
+  padding: 8px;
+}
+
+.footer {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  align-items: center;
+  font-size: 12px;
+  color: var(--app-muted);
+  padding-top: 10px;
+}
+
+.cm-editor,
+.cm-editor .cm-content {
+  font-family: "Noto Sans JP", "Noto Sans", "Yu Gothic", "YuGothic", "Hiragino Kaku Gothic ProN", "Hiragino Kaku Gothic Pro", sans-serif;
+}
+
+.cm-editor {
+  height: 100%;
+  font-size: 14px;
+}
+
+.cm-editor.cm-focused {
+  outline: none;
+}
+
+.cm-editor .cm-gutters {
+  background: var(--editor-gutter-bg);
+  color: var(--editor-gutter-color);
+}
+
+.cm-editor .cm-content {
+  padding: 12px;
+}
+
+.cm-editor .mb-syntax-secondary {
+  color: var(--editor-secondary-color);
+}
+
+.cm-editor .cm-lp-task-checkbox {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  margin-right: 0.35em;
+  transform: translateY(-0.08em);
+}
+
+.cm-editor .cm-lp-task-checkbox-input {
+  width: 0.95em;
+  height: 0.95em;
+  margin: 0;
+  accent-color: var(--editor-checkbox-accent);
+  cursor: pointer;
+}
+
+.cm-editor .cm-lp-task-checkbox-input:disabled {
+  cursor: not-allowed;
+  opacity: var(--editor-checkbox-disabled-opacity);
+}
+
+.cm-editor .cm-diff-marker {
+  display: inline-block;
+  width: 3px;
+  height: 100%;
+  border-radius: 0;
+}
+
+.cm-editor .cm-diff-marker-added {
+  background: var(--editor-diff-added);
+}
+
+.cm-editor .cm-diff-marker-modified {
+  background: var(--editor-diff-modified);
+}
+
+.cm-editor .cm-diff-marker-spacer {
+  opacity: 0;
+}
+
+@media (max-width: 800px) {
+  #app {
+    padding: 12px;
+  }
+
+  .editor {
+    min-height: calc(100vh - 80px);
+  }
+
+  .footer {
+    justify-content: space-between;
+  }
+}

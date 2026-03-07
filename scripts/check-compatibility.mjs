@@ -50,21 +50,65 @@ if (coreVersions.length !== 1) {
 
 const coreVersion = coreVersions[0];
 const matrix = loadJson(join(process.cwd(), "releases", "compatibility-matrix.json"));
-const range = matrix?.apps?.vscode?.supports?.core;
-if (!range || typeof range.min !== "string" || typeof range.max !== "string") {
-  throw new Error("Invalid compatibility matrix: apps.vscode.supports.core min/max are required.");
+
+function validateCoreRangeForApp({ appName, required = false }) {
+  const appConfig = matrix?.apps?.[appName];
+  if (!appConfig) {
+    if (required) {
+      throw new Error(`Invalid compatibility matrix: apps.${appName} is required.`);
+    }
+    return null;
+  }
+
+  const status = typeof appConfig.status === "string" ? appConfig.status : "active";
+  if (status === "reserved") {
+    return {
+      appName,
+      status,
+      min: null,
+      max: null,
+    };
+  }
+
+  const range = appConfig?.supports?.core;
+  if (!range || typeof range.min !== "string" || typeof range.max !== "string") {
+    throw new Error(
+      `Invalid compatibility matrix: apps.${appName}.supports.core min/max are required when status=${status}.`,
+    );
+  }
+
+  if (compareSemver(range.min, range.max) > 0) {
+    throw new Error(
+      `Invalid ${appName} compatibility range: min (${range.min}) is greater than max (${range.max}).`,
+    );
+  }
+
+  if (compareSemver(coreVersion, range.min) < 0 || compareSemver(coreVersion, range.max) > 0) {
+    throw new Error(
+      `Core version ${coreVersion} is outside ${appName} compatibility range [${range.min}, ${range.max}].`,
+    );
+  }
+
+  return {
+    appName,
+    status,
+    min: range.min,
+    max: range.max,
+  };
 }
 
-if (compareSemver(range.min, range.max) > 0) {
-  throw new Error(`Invalid compatibility range: min (${range.min}) is greater than max (${range.max}).`);
-}
+const results = [
+  validateCoreRangeForApp({ appName: "vscode", required: true }),
+  validateCoreRangeForApp({ appName: "mac", required: false }),
+].filter(Boolean);
 
-if (compareSemver(coreVersion, range.min) < 0 || compareSemver(coreVersion, range.max) > 0) {
-  throw new Error(
-    `Core version ${coreVersion} is outside VS Code compatibility range [${range.min}, ${range.max}].`,
-  );
-}
+const rendered = results
+  .map((result) => {
+    if (result.min === null || result.max === null) {
+      return `${result.appName}=reserved`;
+    }
+    return `${result.appName}=[${result.min}, ${result.max}]`;
+  })
+  .join(", ");
 
-console.log(
-  `Compatibility check passed: core=${coreVersion}, vscode range=[${range.min}, ${range.max}]`,
-);
+console.log(`Compatibility check passed: core=${coreVersion}, ${rendered}`);

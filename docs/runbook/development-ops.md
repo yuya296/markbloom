@@ -19,12 +19,13 @@
    - `pnpm install`
 4) 開発サーバを起動する
    - `pnpm -C apps/webview-demo dev`
+   - `pnpm -C apps/mac tauri:dev`（mac アプリ）
 
 ## バージョン管理 (SemVer)
 - release line ごとに独立 SemVer を採用する
   - `core`（`@yuya296/cm6-*`）: lockstep 運用
   - `vscode`（`markbloom`）: 独立運用
-  - `mac`（将来）: 独立運用を想定
+  - `mac`（`apps/mac`）: 独立運用（現状は `0.1.x`）
 - リリース時にのみ `package.json` を更新
 - 未デプロイの変更は Git 履歴で管理
 
@@ -45,6 +46,7 @@
 3) Actions で対象 workflow を手動実行
    - core: `.github/workflows/core-release.yml`
    - vscode: `.github/workflows/vscode-release.yml`
+   - mac: なし（ローカルで `pnpm -C apps/mac tauri:build`）
 4) GitHub Releases を確認
    - core: `core-vX.Y.Z`
    - vscode: `vscode-vX.Y.Z`
@@ -60,8 +62,12 @@
 
 ## 互換性契約
 - 正本: `releases/compatibility-matrix.json`
-- 現在は `vscode -> core` の min/max 範囲を CI / release workflow で検証
-- 将来は `mac -> core` の範囲を同ファイルに追加する
+- 現在は `vscode -> core` と `mac -> core` の min/max 範囲を CI で検証
+- `mac` を reserved に戻す場合は `apps.mac.status = \"reserved\"` に設定する
+
+## mac app 運用補足
+- v1 はローカル配布のみ（署名 / Notarization / Auto Update なし）。
+- Apple Silicon をターゲットに `pnpm -C apps/mac tauri:build` を使用する。
 
 ## Links
 - `docs/runbook/cicd.md`

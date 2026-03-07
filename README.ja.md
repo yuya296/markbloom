@@ -25,6 +25,7 @@ MarkBloom は、**Markdown を “真実のソース” のまま**、人間が 
 
 - `apps/webview-demo`: CM6 + MarkBloom 拡張の統合デモアプリ
 - `apps/vscode-extension`: VS Code 拡張アプリ（`markbloom`）
+- `apps/mac`: Tauri 2 ベースの mac ネイティブアプリ（`MarkBloom`）
 - `packages/core/cm6-*`: npm 公開する core CM6 ライブラリ群
 - `docs/`: アーキテクチャ、runbook、ADR、機能仕様
 

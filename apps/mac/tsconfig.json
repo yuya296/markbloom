@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "types": ["vite/client"],
+    "baseUrl": ".",
+    "paths": {
+      "@yuya296/cm6-diff-gutter": ["../../packages/core/cm6-diff-gutter/src/index.ts"],
+      "@yuya296/cm6-live-preview": ["../../packages/core/cm6-live-preview/src/index.ts"],
+      "@yuya296/cm6-live-preview-mermaid": ["../../packages/core/cm6-live-preview-mermaid/src/index.ts"],
+      "@yuya296/cm6-markdown-smart-bol": ["../../packages/core/cm6-markdown-smart-bol/src/index.ts"],
+      "@yuya296/cm6-table": ["../../packages/core/cm6-table/src/index.ts"],
+      "@yuya296/cm6-live-preview-core": ["../../packages/core/cm6-live-preview-core/src/index.ts"],
+      "@yuya296/cm6-markdown-semantics": ["../../packages/core/cm6-markdown-semantics/src/index.ts"],
+      "@yuya296/cm6-typography-theme": ["../../packages/core/cm6-typography-theme/src/index.ts"]
+    }
+  },
+  "include": ["src"]
+}

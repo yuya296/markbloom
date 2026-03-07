@@ -1,7 +1,7 @@
 # CI/CD Runbook
 
 ## Scope
-- 対象: `core`（`packages/core/cm6-*`）と `vscode`（`apps/vscode-extension`）
+- 対象: `core`（`packages/core/cm6-*`）、`vscode`（`apps/vscode-extension`）、`mac`（`apps/mac`）
 - 目的: 配布チャネルごとに release line を分離し、手動リリースの誤操作を減らす
 
 ## Release Lines
@@ -14,7 +14,10 @@
   - workflow: `.github/workflows/vscode-release.yml`
   - tag: `vscode-vX.Y.Z`
 - `mac`:
-  - 現時点は reserved（実装なし）。互換性スロットのみ `releases/compatibility-matrix.json` に保持。
+  - 実装: `apps/mac`（Tauri 2）
+  - 配布先: ローカルビルド（`.app`, Apple Silicon）
+  - workflow: なし（v1は手動配布のみ）
+  - tag: なし（将来追加）
 
 ## CI (自動)
 - Trigger: `pull_request`, `push` (main)
@@ -78,6 +81,15 @@
   - tag作成 (`vscode-vX.Y.Z`)
   - GitHub Release 作成（`release_notes/vscode.md` ベース）
 
+### mac app build (ローカル)
+- 入口:
+  - `pnpm -C apps/mac build`
+  - `pnpm -C apps/mac tauri:build`
+- 出力:
+  - `apps/mac/src-tauri/target/aarch64-apple-darwin/release/bundle/macos/*.app`
+- 注意:
+  - v1では署名 / Notarization / Auto Update は実施しない（将来対応）。
+
 ## Node 実行ポリシー
 - 開発の最小要件は `Node 22+`
 - 開発時の推奨バージョンは `.nvmrc` の `24`（`nvm use` を前提）
@@ -88,6 +100,7 @@
 - main への push では publish しない
 - 互換性契約は `releases/compatibility-matrix.json` を正本とする
 - release 証跡は GitHub Releases を正本とする
+- `apps/mac` はローカル配布 line のため、現時点では GitHub Release 証跡を持たない
 
 ## Links
 - `docs/runbook/development-ops.md`
