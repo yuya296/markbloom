@@ -5,6 +5,10 @@ import { livePreviewPreset, resolveImageBasePath } from "@yuya296/cm6-live-previ
 import { createEditor, EditorHandle } from "./editor/createEditor";
 import { editorHighlightStyle } from "./editor/editorHighlightStyle";
 import { editorTheme } from "./editor/editorTheme";
+import {
+  resolveMermaidPreviewEnabled,
+  resolvePreviewFeatureFlags,
+} from "./editor/featureFlags";
 import "./style.scss";
 
 type MarkBloomConfig = {
@@ -116,6 +120,7 @@ const buildExtensions = ({
   diffBaselineText,
 }: ExtensionOptions): Extension[] => {
   const extensions: Extension[] = [];
+  const previewFeatureFlags = resolvePreviewFeatureFlags();
 
   extensions.push(
     diffGutter({
@@ -149,8 +154,11 @@ const buildExtensions = ({
             imageRawShowsPreview: true,
           }
         : false,
-      // Temporarily disable Mermaid preview due to instability.
-      mermaid: false,
+      // Mermaid is paused for now. Re-enable by flipping the feature flag.
+      mermaid: resolveMermaidPreviewEnabled({
+        livePreviewEnabled,
+        featureFlags: previewFeatureFlags,
+      }),
       table: tableEnabled,
     })
   );

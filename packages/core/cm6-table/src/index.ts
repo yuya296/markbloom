@@ -15,7 +15,6 @@ import {
   WidgetType,
   keymap,
 } from "@codemirror/view";
-import type { SyntaxNode } from "@lezer/common";
 import type { TableAlignment, TableData } from "./types";
 import {
   cloneTableData,
@@ -30,11 +29,28 @@ import {
   normalizeTableData,
 } from "./tableModel";
 import {
-  buildTableMarkdown,
-  parseAlignmentsFromLines,
+  buildTableCommitChange,
+  clampCellSelection,
+  getTableCellText,
+  setTableCellText,
+} from "./tableEditing";
+import {
+  computeColumnHandlePosition,
+  computeOutlineBox,
+  computeRowHandlePosition,
+} from "./tableLayout";
+import {
   toDisplayText,
   toMarkdownText,
 } from "./tableMarkdown";
+import {
+  collectTableBoundaries,
+  collectTableData,
+  collectTableLines,
+  createTableKey,
+  isLikelyTableBoundaryCandidateLine,
+  type TableBoundaryInfo,
+} from "./tableDetection";
 
 export type { TableAlignment, TableData };
 
@@ -91,13 +107,6 @@ type ColumnDropMarker =
       side: "before" | "after";
     }
   | null;
-
-type TableBoundaryInfo = {
-  key: string;
-  startLineNumber: number;
-  endLineNumber: number;
-  totalRows: number;
-};
 
 type FocusCellRequest = {
   row: number;
@@ -271,36 +280,16 @@ class TableWidget extends WidgetType {
     };
 
     const clampCell = (nextRow: number, nextCol: number): CellSelection => {
-      const row = Math.min(Math.max(nextRow, 0), getTotalRows() - 1);
-      const col = Math.min(Math.max(nextCol, 0), columnCount - 1);
-      return { kind: "cell", row, col };
+      return {
+        kind: "cell",
+        ...clampCellSelection(nextRow, nextCol, getTotalRows(), columnCount),
+      };
     };
 
-    const getCellText = (cell: CellSelection): string => {
-      if (cell.row === 0) {
-        return data.header?.cells[cell.col]?.text ?? "";
-      }
-      return data.rows[cell.row - 1]?.cells[cell.col]?.text ?? "";
-    };
+    const getCellText = (cell: CellSelection): string => getTableCellText(data, cell);
 
     const setCellText = (cell: CellSelection, value: string) => {
-      if (cell.row === 0) {
-        if (data.header) {
-          data.header.cells[cell.col] = {
-            ...(data.header.cells[cell.col] ?? { from: -1, to: -1 }),
-            text: value,
-          };
-        }
-        return;
-      }
-      const targetRow = data.rows[cell.row - 1];
-      if (!targetRow) {
-        return;
-      }
-      targetRow.cells[cell.col] = {
-        ...(targetRow.cells[cell.col] ?? { from: -1, to: -1 }),
-        text: value,
-      };
+      setTableCellText(data, cell, value);
     };
 
     const updateCellDisplay = (cell: CellSelection) => {
@@ -316,27 +305,14 @@ class TableWidget extends WidgetType {
     };
 
     const dispatchCommit = () => {
-      normalizeTableData(data);
-      const doc = view.state.doc;
-      const startLine = doc.line(this.tableInfo.startLineNumber);
-      const endLine = doc.line(this.tableInfo.endLineNumber);
-      const startLineFrom = startLine.from;
-      const endLineTo = endLine.to;
-      let suffix = "";
-      for (let pos = endLineTo; pos < doc.length; pos += 1) {
-        const char = doc.sliceString(pos, pos + 1);
-        if (char !== "\n") {
-          break;
-        }
-        suffix += "\n";
-      }
-      const markdown = `${buildTableMarkdown(data)}${suffix}`;
+      const changes = buildTableCommitChange(
+        view.state,
+        data,
+        this.tableInfo.startLineNumber,
+        this.tableInfo.endLineNumber
+      );
       dispatchOutsideUpdate(view, {
-        changes: {
-          from: startLineFrom,
-          to: endLineTo + suffix.length,
-          insert: markdown,
-        },
+        changes,
         annotations: tableEditAnnotation.of(true),
       });
     };
@@ -467,16 +443,12 @@ class TableWidget extends WidgetType {
       const wrapperRect = wrapper.getBoundingClientRect();
       const startRect = startCell.getBoundingClientRect();
       const endRect = endCell.getBoundingClientRect();
+      const box = computeOutlineBox(wrapperRect, startRect, endRect);
 
-      const left = Math.min(startRect.left, endRect.left) - wrapperRect.left;
-      const top = Math.min(startRect.top, endRect.top) - wrapperRect.top;
-      const right = Math.max(startRect.right, endRect.right) - wrapperRect.left;
-      const bottom = Math.max(startRect.bottom, endRect.bottom) - wrapperRect.top;
-
-      selectionOutline.style.left = `${left}px`;
-      selectionOutline.style.top = `${top}px`;
-      selectionOutline.style.width = `${Math.max(0, right - left)}px`;
-      selectionOutline.style.height = `${Math.max(0, bottom - top)}px`;
+      selectionOutline.style.left = `${box.left}px`;
+      selectionOutline.style.top = `${box.top}px`;
+      selectionOutline.style.width = `${box.width}px`;
+      selectionOutline.style.height = `${box.height}px`;
       selectionOutline.dataset.open = "true";
     };
 
@@ -490,11 +462,13 @@ class TableWidget extends WidgetType {
           return;
         }
         const rect = cell.getBoundingClientRect();
-        const left = rect.left - wrapperRect.left + rect.width / 2;
-        const top =
-          rect.top - wrapperRect.top - TableWidget.colHandleOutsideOffset;
-        button.style.left = `${left}px`;
-        button.style.top = `${top}px`;
+        const position = computeColumnHandlePosition(
+          wrapperRect,
+          rect,
+          TableWidget.colHandleOutsideOffset
+        );
+        button.style.left = `${position.left}px`;
+        button.style.top = `${position.top}px`;
       });
 
       rowHandleButtons.forEach((button, row) => {
@@ -505,14 +479,14 @@ class TableWidget extends WidgetType {
           return;
         }
         const rect = cell.getBoundingClientRect();
-        const left = rect.left - wrapperRect.left - TableWidget.rowHandleOutsideOffset;
-        const top =
-          rect.top -
-          wrapperRect.top +
-          rect.height / 2 +
-          TableWidget.rowHandleVisualOffsetY;
-        button.style.left = `${left}px`;
-        button.style.top = `${top}px`;
+        const position = computeRowHandlePosition(
+          wrapperRect,
+          rect,
+          TableWidget.rowHandleOutsideOffset,
+          TableWidget.rowHandleVisualOffsetY
+        );
+        button.style.left = `${position.left}px`;
+        button.style.top = `${position.top}px`;
       });
     };
 
@@ -1847,106 +1821,6 @@ function dispatchOutsideTransaction(
     view.scrollDOM.scrollTop = scrollTop;
     view.scrollDOM.scrollLeft = scrollLeft;
   });
-}
-
-function hashString(value: string): string {
-  let hash = 2166136261;
-  for (let i = 0; i < value.length; i += 1) {
-    hash ^= value.charCodeAt(i);
-    hash = Math.imul(hash, 16777619);
-  }
-  return (hash >>> 0).toString(36);
-}
-
-function createTableKey(lines: ReturnType<typeof collectTableLines>): string {
-  const first = lines[0];
-  const last = lines[lines.length - 1];
-  const signature = lines.map((line) => line.text).join("\n");
-  return `${first.from}-${last.to}-${hashString(signature)}`;
-}
-
-function collectTableBoundaries(state: EditorState): TableBoundaryInfo[] {
-  const tables: TableBoundaryInfo[] = [];
-
-  syntaxTree(state).iterate({
-    enter: (node) => {
-      if (node.name !== "Table") {
-        return;
-      }
-      const lines = collectTableLines(state, node.from, node.to);
-      if (lines.length === 0) {
-        return;
-      }
-      const data = collectTableData(state, node.node, lines);
-      tables.push({
-        key: createTableKey(lines),
-        startLineNumber: lines[0].number,
-        endLineNumber: lines[lines.length - 1].number,
-        totalRows: data.rows.length + 1,
-      });
-    },
-  });
-
-  return tables;
-}
-
-function isLikelyTableBoundaryCandidateLine(lineText: string): boolean {
-  const text = lineText.trim();
-  if (text.length === 0 || !text.includes("|")) {
-    return false;
-  }
-  if (/^\|?[-:\s]+(\|[-:\s]+)+\|?$/u.test(text)) {
-    return true;
-  }
-  return /^\|.*\|$/u.test(text);
-}
-
-function collectTableData(
-  state: EditorState,
-  node: SyntaxNode,
-  lines: ReturnType<typeof collectTableLines>
-): TableData {
-  const headerNode = node.getChild("TableHeader");
-  const rowNodes = node.getChildren("TableRow");
-  const header = headerNode ? { cells: collectCells(state, headerNode) } : null;
-  const rows = rowNodes.map((row) => ({ cells: collectCells(state, row) }));
-  const columnCount = Math.max(
-    header?.cells.length ?? 0,
-    ...rows.map((row) => row.cells.length),
-    0
-  );
-  const alignments = parseAlignmentsFromLines(lines.map((line) => line.text), columnCount);
-  return { header, rows, alignments };
-}
-
-function collectTableLines(state: EditorState, from: number, to: number) {
-  const lines = [];
-  const startLine = state.doc.lineAt(from);
-  const endLine = state.doc.lineAt(Math.max(from, to - 1));
-  for (let lineNumber = startLine.number; lineNumber <= endLine.number; lineNumber += 1) {
-    lines.push(state.doc.line(lineNumber));
-  }
-  while (lines.length > 0 && lines[lines.length - 1].text.trim() === "") {
-    lines.pop();
-  }
-  return lines;
-}
-
-function collectCells(
-  state: EditorState,
-  rowNode: SyntaxNode
-): Array<{ text: string; from: number; to: number }> {
-  const cells: Array<{ text: string; from: number; to: number }> = [];
-  for (let child = rowNode.firstChild; child; child = child.nextSibling) {
-    if (child.name === "TableCell") {
-      cells.push({
-        text: state.doc.sliceString(child.from, child.to).trim(),
-        from: child.from,
-        to: child.to,
-      });
-    }
-  }
-  return cells;
 }
 
 function buildDecorations(

@@ -96,14 +96,14 @@
     "publish": "pnpm run build && npx @vscode/vsce publish --no-dependencies"
   },
   "dependencies": {
-    "@codemirror/commands": "^6.10.1",
+    "@codemirror/commands": "^6.10.2",
     "@codemirror/lang-markdown": "^6.5.0",
     "@codemirror/language": "^6.12.1",
     "@codemirror/language-data": "^6.5.2",
     "@codemirror/state": "^6.5.3",
     "@codemirror/view": "^6.39.15",
     "@lezer/highlight": "^1.2.3",
-    "@lezer/markdown": "^1.6.2",
+    "@lezer/markdown": "^1.6.3",
     "@yuya296/cm6-diff-gutter": "workspace:*",
     "@yuya296/cm6-live-preview": "workspace:*",
     "@yuya296/cm6-markdown-smart-bol": "workspace:*"
