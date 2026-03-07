@@ -15,7 +15,6 @@ import {
   WidgetType,
   keymap,
 } from "@codemirror/view";
-import type { SyntaxNode } from "@lezer/common";
 import type { TableAlignment, TableData } from "./types";
 import {
   cloneTableData,
@@ -41,8 +40,6 @@ import {
   computeRowHandlePosition,
 } from "./tableLayout";
 import {
-  buildTableMarkdown,
-  parseAlignmentsFromLines,
   toDisplayText,
   toMarkdownText,
 } from "./tableMarkdown";
