@@ -17,6 +17,8 @@ function createState(
             EditorSelection.range(range.anchor, range.head ?? range.anchor)
           )
         )
+      : selection.head !== undefined
+      ? EditorSelection.range(selection.anchor, selection.head)
       : EditorSelection.cursor(selection.anchor)
     : undefined;
 
@@ -41,6 +43,15 @@ test("treats image node as raw when selection overlaps image markup", () => {
   const state = createState(doc, {
     ranges: [{ anchor: 2, head: 6 }],
   });
+  assert.equal(
+    isInlineRawByTriggers(state, { from: 0, to: doc.length }, "nearby"),
+    true
+  );
+});
+
+test("treats image node as raw when single range selection overlaps image markup", () => {
+  const doc = "![img](a.png)";
+  const state = createState(doc, { anchor: 2, head: 6 });
   assert.equal(
     isInlineRawByTriggers(state, { from: 0, to: doc.length }, "nearby"),
     true
