@@ -231,8 +231,16 @@ export function buildTypographyThemeSpec(
       fontWeight: "600",
       marginRight: "0.25ch",
       verticalAlign: "baseline",
+      position: "relative",
     },
     [`${scope} .cm-lp-list-marker-bullet`]: {
+      color: "transparent",
+    },
+    [`${scope} .cm-lp-list-marker-bullet::before`]: {
+      content: '"•"',
+      position: "absolute",
+      inset: "0",
+      textAlign: "center",
       color: "var(--mb-list-marker-bullet-color, var(--editor-primary-color, currentColor))",
     },
     [`${scope} .cm-lp-list-marker-ordered`]: {

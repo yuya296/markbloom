@@ -42,5 +42,6 @@ test("keeps key selectors for headings, links, code, and list markers", () => {
   assert.ok(spec[".cm-content .mb-code"]);
   assert.ok(spec[".cm-content .cm-lp-list-marker"]);
   assert.ok(spec[".cm-content .cm-lp-list-marker-bullet"]);
+  assert.ok(spec[".cm-content .cm-lp-list-marker-bullet::before"]);
   assert.ok(spec[".cm-content .cm-lp-list-marker-ordered"]);
 });

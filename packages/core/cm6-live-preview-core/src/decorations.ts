@@ -60,6 +60,9 @@ export function buildDecorations(
   const blockHiddenDecoration = Decoration.replace({
     inclusive: false,
   });
+  const blockHiddenMarkerDecoration = Decoration.mark({
+    class: "cm-lp-marker-hidden",
+  });
   const inlineHiddenDecoration = Decoration.replace({
     inclusive: false,
   });
@@ -92,6 +95,7 @@ export function buildDecorations(
         line.text,
         { isSelectionOverlap, cursorHeads, isBlockReveal },
         blockHiddenDecoration,
+        blockHiddenMarkerDecoration,
         fenceMarkersByLine
       );
     }

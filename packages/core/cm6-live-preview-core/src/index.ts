@@ -18,6 +18,18 @@ export type { Range } from "./core/types";
 
 export function livePreviewBaseTheme(): Extension {
   return EditorView.baseTheme({
+    ".cm-content .cm-lp-marker-hidden": {
+      // Keep marker text in layout mapping (for cursor navigation),
+      // while collapsing visual width in rich mode.
+      display: "inline-block",
+      width: "0",
+      minWidth: "0",
+      overflow: "hidden",
+      whiteSpace: "pre",
+      verticalAlign: "baseline",
+      fontSize: "0",
+      lineHeight: "0",
+    },
     ".cm-content .cm-lp-image": {
       display: "inline-block",
       maxWidth: "100%",
