@@ -58,11 +58,18 @@ function parsePositiveInt(value) {
   if (value == null || value === "") {
     return null;
   }
-  const parsed = Number.parseInt(value, 10);
+  if (!/^\d+$/.test(value)) {
+    return null;
+  }
+  const parsed = Number(value);
   if (!Number.isInteger(parsed) || parsed <= 0) {
     return null;
   }
   return parsed;
+}
+
+function hasEnvKey(name) {
+  return Object.prototype.hasOwnProperty.call(process.env, name);
 }
 
 function isValidPort(value) {
@@ -70,16 +77,33 @@ function isValidPort(value) {
 }
 
 function resolvePort(branchName) {
+  const hasExplicitPort = hasEnvKey("MB_PORT");
   const explicitPort = parsePositiveInt(process.env.MB_PORT);
+  if (hasExplicitPort && (!isValidPort(explicitPort))) {
+    throw new Error(`Invalid MB_PORT: ${process.env.MB_PORT}. Expected 1..${MAX_PORT}.`);
+  }
   if (explicitPort != null) {
-    if (!isValidPort(explicitPort)) {
-      throw new Error(`Invalid MB_PORT: ${explicitPort}. Expected 1..${MAX_PORT}.`);
-    }
     return explicitPort;
   }
 
-  const base = parsePositiveInt(process.env.MB_PORT_BASE) ?? DEFAULT_PORT_BASE;
-  const span = parsePositiveInt(process.env.MB_PORT_SPAN) ?? DEFAULT_PORT_SPAN;
+  const hasBase = hasEnvKey("MB_PORT_BASE");
+  const hasSpan = hasEnvKey("MB_PORT_SPAN");
+  const baseCandidate = parsePositiveInt(process.env.MB_PORT_BASE);
+  const spanCandidate = parsePositiveInt(process.env.MB_PORT_SPAN);
+
+  if (hasBase && !isValidPort(baseCandidate)) {
+    throw new Error(
+      `Invalid MB_PORT_BASE: ${process.env.MB_PORT_BASE}. Expected 1..${MAX_PORT}.`,
+    );
+  }
+  if (hasSpan && spanCandidate == null) {
+    throw new Error(
+      `Invalid MB_PORT_SPAN: ${process.env.MB_PORT_SPAN}. Expected positive integer.`,
+    );
+  }
+
+  const base = baseCandidate ?? DEFAULT_PORT_BASE;
+  const span = spanCandidate ?? DEFAULT_PORT_SPAN;
   if (!isValidPort(base)) {
     throw new Error(`Invalid MB_PORT_BASE: ${base}. Expected 1..${MAX_PORT}.`);
   }
