@@ -20,6 +20,7 @@
   --editor-diff-rail: rgba(106, 98, 87, 0.32);
   --editor-caret-color: #0f5b9e;
   --editor-checkbox-accent: var(--editor-primary-color);
+  --editor-checkbox-size: 1.25em;
   --editor-checkbox-disabled-opacity: 0.55;
   --mb-font-mono: "JetBrains Mono", "SF Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
   --mb-inline-code-bg: rgba(15, 91, 158, 0.08);
@@ -158,8 +159,8 @@ main {
 }
 
 .cm-editor .cm-lp-task-checkbox-input {
-  width: 0.95em;
-  height: 0.95em;
+  width: var(--editor-checkbox-size);
+  height: var(--editor-checkbox-size);
   margin: 0;
   accent-color: var(--editor-checkbox-accent);
   cursor: pointer;
