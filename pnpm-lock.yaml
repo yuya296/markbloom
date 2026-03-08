@@ -81,8 +81,8 @@ importers:
         version: link:../../packages/core/cm6-markdown-smart-bol
     devDependencies:
       '@types/node':
-        specifier: ^24.3.1
-        version: 24.10.7
+        specifier: ^25.3.3
+        version: 25.3.3
       '@types/vscode':
         specifier: ^1.109.0
         version: 1.109.0
@@ -94,7 +94,7 @@ importers:
         version: 5.9.3
       vite:
         specifier: ^7.3.0
-        version: 7.3.0(@types/node@24.10.7)(sass@1.97.3)(tsx@4.21.0)
+        version: 7.3.0(@types/node@25.3.3)(sass@1.97.3)(tsx@4.21.0)
 
   apps/webview-demo:
     dependencies:
@@ -137,7 +137,7 @@ importers:
         version: 1.97.3
       vite:
         specifier: ^7.3.0
-        version: 7.3.0(@types/node@24.10.7)(sass@1.97.3)(tsx@4.21.0)
+        version: 7.3.0(@types/node@25.3.3)(sass@1.97.3)(tsx@4.21.0)
 
   packages/core/cm6-diff-gutter:
     devDependencies:
@@ -243,8 +243,8 @@ importers:
         specifier: 6.39.8
         version: 6.39.8
       '@types/node':
-        specifier: ^24.10.7
-        version: 24.10.7
+        specifier: ^25.3.3
+        version: 25.3.3
       '@yuya296/cm6-live-preview-core':
         specifier: workspace:*
         version: link:../cm6-live-preview-core
@@ -1166,8 +1166,8 @@ packages:
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
-  '@types/node@24.10.7':
-    resolution: {integrity: sha512-+054pVMzVTmRQV8BhpGv3UyfZ2Llgl8rdpDTon+cUH9+na0ncBVXj3wTUKh14+Kiz18ziM3b4ikpP5/Pc0rQEQ==}
+  '@types/node@25.3.3':
+    resolution: {integrity: sha512-DpzbrH7wIcBaJibpKo9nnSQL0MTRdnWttGyE5haGwK86xgMOkFLp7vEyfQPGLOJh5wNYiJ3V9PmUMDhV9u8kkQ==}
 
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
@@ -2380,8 +2380,8 @@ packages:
   ufo@1.6.2:
     resolution: {integrity: sha512-heMioaxBcG9+Znsda5Q8sQbWnLJSl98AFDXTO80wELWEzX3hordXsTdxrIfMQoO9IY1MEnoGoPjpoKpMj+Yx0Q==}
 
-  undici-types@7.16.0:
-    resolution: {integrity: sha512-Zz+aZWSj8LE6zoxD+xrjh4VfkIG8Ya6LvYkZqtUQGJPZjYl53ypCaUwWqo7eI0x66KBGeRo+mlBEkMSeSZ38Nw==}
+  undici-types@7.18.2:
+    resolution: {integrity: sha512-AsuCzffGHJybSaRrmr5eHr81mwJU3kjw6M+uprWvCXiNeN9SOGwQ3Jn8jb8m3Z6izVgknn1R0FTCEAP2QrLY/w==}
 
   undici@7.22.0:
     resolution: {integrity: sha512-RqslV2Us5BrllB+JeiZnK4peryVTndy9Dnqq62S3yYRRTj0tFQCwEniUy2167skdGOy3vqRzEvl1Dm4sV2ReDg==}
@@ -3377,9 +3377,9 @@ snapshots:
 
   '@types/json-schema@7.0.15': {}
 
-  '@types/node@24.10.7':
+  '@types/node@25.3.3':
     dependencies:
-      undici-types: 7.16.0
+      undici-types: 7.18.2
 
   '@types/trusted-types@2.0.7':
     optional: true
@@ -4696,7 +4696,7 @@ snapshots:
 
   ufo@1.6.2: {}
 
-  undici-types@7.16.0: {}
+  undici-types@7.18.2: {}
 
   undici@7.22.0: {}
 
@@ -4710,7 +4710,7 @@ snapshots:
 
   uuid@11.1.0: {}
 
-  vite@7.3.0(@types/node@24.10.7)(sass@1.97.3)(tsx@4.21.0):
+  vite@7.3.0(@types/node@25.3.3)(sass@1.97.3)(tsx@4.21.0):
     dependencies:
       esbuild: 0.27.2
       fdir: 6.5.0(picomatch@4.0.3)
@@ -4719,7 +4719,7 @@ snapshots:
       rollup: 4.54.0
       tinyglobby: 0.2.15
     optionalDependencies:
-      '@types/node': 24.10.7
+      '@types/node': 25.3.3
       fsevents: 2.3.3
       sass: 1.97.3
       tsx: 4.21.0
