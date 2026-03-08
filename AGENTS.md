@@ -38,7 +38,7 @@
 - 初回セットアップ: `nvm use && corepack enable && pnpm install`
 - 起動: `pnpm -C apps/webview-demo dev`
 - PM2起動: `pm2 start ecosystem.config.cjs --update-env`
-- PM2プロセス名: `webview-demo-<branch-slug>`
+- PM2プロセス名: `webview-demo-<branch-slug>-<branch-hash6>`
 - PM2ポート: branch名から自動決定。必要時のみ `MB_PORT=<port> pm2 start ecosystem.config.cjs --update-env` で上書き
 - 主要Lint/型チェック: 各パッケージの`package.json`参照。
 

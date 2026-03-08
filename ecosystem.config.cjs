@@ -1,10 +1,12 @@
 const { execSync } = require("node:child_process");
+const os = require("node:os");
 const path = require("node:path");
 
 const APP_BASE_NAME = "webview-demo";
 const DEFAULT_PORT_BASE = 5300;
 const DEFAULT_PORT_SPAN = 400;
 const FALLBACK_BRANCH = "unknown";
+const MAX_PORT = 65535;
 
 function readGitBranch(repoRoot) {
   try {
@@ -63,25 +65,49 @@ function parsePositiveInt(value) {
   return parsed;
 }
 
-function resolvePort(branchSlug) {
+function isValidPort(value) {
+  return Number.isInteger(value) && value >= 1 && value <= MAX_PORT;
+}
+
+function resolvePort(branchName) {
   const explicitPort = parsePositiveInt(process.env.MB_PORT);
   if (explicitPort != null) {
+    if (!isValidPort(explicitPort)) {
+      throw new Error(`Invalid MB_PORT: ${explicitPort}. Expected 1..${MAX_PORT}.`);
+    }
     return explicitPort;
   }
 
   const base = parsePositiveInt(process.env.MB_PORT_BASE) ?? DEFAULT_PORT_BASE;
   const span = parsePositiveInt(process.env.MB_PORT_SPAN) ?? DEFAULT_PORT_SPAN;
-  return base + (hashText(branchSlug) % span);
+  if (!isValidPort(base)) {
+    throw new Error(`Invalid MB_PORT_BASE: ${base}. Expected 1..${MAX_PORT}.`);
+  }
+  if (!Number.isInteger(span) || span <= 0) {
+    throw new Error(`Invalid MB_PORT_SPAN: ${span}. Expected positive integer.`);
+  }
+  if (base + span - 1 > MAX_PORT) {
+    throw new Error(`Invalid port range: ${base}..${base + span - 1}. Max is ${MAX_PORT}.`);
+  }
+  return base + (hashText(branchName) % span);
+}
+
+function resolveHomeDir(fallbackPath) {
+  try {
+    return os.homedir();
+  } catch {}
+  return process.env.HOME || process.env.USERPROFILE || fallbackPath;
 }
 
 const repoRoot = __dirname;
 const branchName = process.env.MB_BRANCH ?? readGitBranch(repoRoot);
 const branchSlug = toSlug(branchName);
-const appName = `${APP_BASE_NAME}-${branchSlug}`;
-const namespace = `dev-${branchSlug}`;
-const port = resolvePort(branchSlug);
+const branchHash = hashText(branchName).toString(16).padStart(8, "0").slice(0, 6);
+const appName = `${APP_BASE_NAME}-${branchSlug}-${branchHash}`;
+const namespace = `dev-${branchSlug}-${branchHash}`;
+const port = resolvePort(branchName);
 
-const pm2Home = process.env.PM2_HOME || path.join(process.env.HOME || repoRoot, ".pm2");
+const pm2Home = process.env.PM2_HOME || path.join(resolveHomeDir(repoRoot), ".pm2");
 const pm2LogsDir = path.join(pm2Home, "logs");
 const pm2PidsDir = path.join(pm2Home, "pids");
 
@@ -100,6 +126,7 @@ module.exports = {
         NODE_ENV: "development",
         MB_BRANCH: branchName,
         MB_BRANCH_SLUG: branchSlug,
+        MB_BRANCH_HASH: branchHash,
         MB_APP_NAME: appName,
         MB_PORT: String(port),
       },
