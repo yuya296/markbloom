@@ -61,6 +61,7 @@
   );
   --editor-caret-color: var(--vscode-editorCursor-foreground, #0f5b9e);
   --editor-checkbox-accent: var(--vscode-textLink-foreground, #0f5b9e);
+  --editor-checkbox-size: 1.25em;
   --editor-checkbox-disabled-opacity: 0.55;
   --mb-font-mono: var(
     --vscode-editor-font-family,
@@ -381,8 +382,8 @@ footer.footer {
 }
 
 .cm-editor .cm-lp-task-checkbox-input {
-  width: 0.95em;
-  height: 0.95em;
+  width: var(--editor-checkbox-size);
+  height: var(--editor-checkbox-size);
   margin: 0;
   accent-color: var(--editor-checkbox-accent);
   cursor: pointer;

@@ -11,3 +11,35 @@ test("markdown semantics exposes heading ids and link href metadata", async ({ p
     page.locator('.cm-content [data-href="#links-and-images"]').first()
   ).toBeVisible();
 });
+
+test("task checkbox is large enough and toggles checked state", async ({ page }) => {
+  await page.goto("/");
+
+  await page.locator(".cm-content").click();
+  await page.mouse.wheel(0, 8000);
+
+  const taskCheckbox = page.locator(".cm-lp-task-checkbox-input").first();
+  await expect(taskCheckbox).toBeVisible();
+
+  const box = await taskCheckbox.boundingBox();
+  if (!box) {
+    throw new Error("Failed to resolve checkbox bounding box");
+  }
+  expect(box.width).toBeGreaterThanOrEqual(16);
+  expect(box.height).toBeGreaterThanOrEqual(16);
+
+  const initiallyChecked = await taskCheckbox.isChecked();
+  await taskCheckbox.click();
+  if (initiallyChecked) {
+    await expect(taskCheckbox).not.toBeChecked();
+  } else {
+    await expect(taskCheckbox).toBeChecked();
+  }
+
+  await taskCheckbox.click();
+  if (initiallyChecked) {
+    await expect(taskCheckbox).toBeChecked();
+  } else {
+    await expect(taskCheckbox).not.toBeChecked();
+  }
+});

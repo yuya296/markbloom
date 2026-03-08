@@ -41,3 +41,4 @@ Thumbs.db
 .playwright-cli
 test-results/
 .pnpm-store/
+/.worktrees/

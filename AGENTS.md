@@ -5,11 +5,15 @@
 - ADRが必要なら追加/更新
 - Domain/Glossaryに用語追加
 - Overview図が変わるなら更新
+- 実装着手時は`implement`スキル、ユーザ完了報告時は`dod`スキルを使用
+- `dod`スキルでDoD確認が完了するまで、ユーザへの完了報告を禁止（質問・確認は可）
 - GitHubでPRを作成し、以下をすべて確認
+  - `update branch` を実施済みであること
+  - `update branch` 後の内容をローカルに `git pull` して同期済みであること
   - レビュー指摘コメントにすべて対応していること
     - 対応不要なら理由を記載してResolve
     - 対応必要なら対応内容とcommit hashをコメントしてResolve
-  - CIが通っていること
+  - `update branch` 後の最新コミットでCIが通っていること
 
 ## Repository Overview (Quick Start)
 
@@ -37,7 +41,9 @@
 - 前提: Node.js `22+`（推奨: `.nvmrc` の `24.x`）
 - 初回セットアップ: `nvm use && corepack enable && pnpm install`
 - 起動: `pnpm -C apps/webview-demo dev`
-- PM2起動: `pm2 start ecosystem.config.cjs`
+- PM2起動: `pm2 start ecosystem.config.cjs --update-env`
+- PM2プロセス名: `webview-demo-<branch-slug>-<branch-hash6>`
+- PM2ポート: branch名から自動決定。必要時のみ `MB_PORT=<port> pm2 start ecosystem.config.cjs --update-env` で上書き
 - 主要Lint/型チェック: 各パッケージの`package.json`参照。
 
 ### Branch Naming
@@ -49,6 +55,7 @@
 ### Change Checklist (Keep It Short)
 - 機能変更: 影響パッケージの責務を確認し、該当モジュールに最小変更。
 - 型定義: 既存モジュールに公開型（export type）がある場合は、インライン再定義せず再利用する。
-- 作業後（毎回）: `pnpm -C apps/webview-demo build` と `pm2 start ecosystem.config.cjs` で確認。
+- 作業後（毎回）: `pnpm -C apps/webview-demo build` と `pm2 start ecosystem.config.cjs --update-env` で確認。
+- 並行開発: 同一branchを複数worktreeで同時起動しない（PM2識別子はbranch基準）。
 - UI/テーマ変更: `webview-demo`のCSS変数とテーマ拡張の両方を確認。
 - 検証: playwright-cliで動作確認すること。

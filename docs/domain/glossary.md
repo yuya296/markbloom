@@ -59,3 +59,5 @@
 - Webview Pages: `apps/webview-demo` を GitHub Pages に公開する自動配信 workflow（`.github/workflows/webview-pages.yml`）。
 - PR Preview Path: PR番号ごとに割り当てる Pages 配下の公開パス（`pr-<PR番号>/`）。
 - Main Snapshot URL: `main` の最新 webview-demo 断面を公開する固定 URL（`https://yuya296.github.io/MarkBloom/`）。
+- Branch-scoped PM2 Process: `ecosystem.config.cjs` で branch 名から生成する PM2 プロセス識別子（`webview-demo-<branch-slug>-<branch-hash6>`）。
+- Deterministic Dev Port: branch 名ハッシュから決定する固定範囲内の dev ポート。必要時は `MB_PORT` で明示上書きする。
