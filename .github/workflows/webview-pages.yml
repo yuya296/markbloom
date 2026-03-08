@@ -59,7 +59,7 @@ jobs:
 
       - name: Build webview demo (main snapshot)
         env:
-          VITE_BASE_PATH: /MarkBloom/
+          VITE_BASE_PATH: /${{ github.event.repository.name }}/
         run: pnpm -C apps/webview-demo build
 
       - name: Publish main snapshot to Pages
@@ -119,7 +119,7 @@ jobs:
       - name: Build webview demo (PR preview)
         if: steps.source.outputs.same_repo == 'true'
         env:
-          VITE_BASE_PATH: /MarkBloom/pr-${{ github.event.pull_request.number }}/
+          VITE_BASE_PATH: /${{ github.event.repository.name }}/pr-${{ github.event.pull_request.number }}/
         run: pnpm -C apps/webview-demo build
 
       - name: Publish PR preview to Pages
@@ -136,7 +136,7 @@ jobs:
         if: steps.source.outputs.same_repo == 'true'
         uses: actions/github-script@v8
         env:
-          PREVIEW_URL: https://yuya296.github.io/MarkBloom/pr-${{ github.event.pull_request.number }}/
+          PREVIEW_URL: https://yuya296.github.io/${{ github.event.repository.name }}/pr-${{ github.event.pull_request.number }}/
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |

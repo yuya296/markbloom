@@ -2,6 +2,7 @@ import { Extension, StateField } from "@codemirror/state";
 import { type DecorationSet, EditorView } from "@codemirror/view";
 import { buildDecorations } from "./decorations";
 import { type LivePreviewOptions, resolveLivePreviewOptions } from "./options";
+import { imageBlockCursorNavigation } from "./inline/imageBlockCursorNavigation";
 
 export type {
   LivePreviewOptions,
@@ -58,5 +59,5 @@ export function livePreview(options: LivePreviewOptions = {}): Extension {
     provide: (field) => EditorView.decorations.from(field),
   });
 
-  return [livePreviewBaseTheme(), decorations];
+  return [livePreviewBaseTheme(), imageBlockCursorNavigation(), decorations];
 }
