@@ -12,6 +12,7 @@
 - `NPM_TOKEN` を GitHub Secrets に登録
   - scope: publish 可能なトークン
   - name: `NPM_TOKEN`
+  - `core-release.yml` では `npm whoami` が `yuya296` であることを本番実行時に検証する
 - VS Code Marketplace 用 PAT を GitHub Secrets に登録
   - scope: extension publish 可能なトークン
   - name: `VSCE_PAT`

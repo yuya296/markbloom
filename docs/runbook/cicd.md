@@ -65,6 +65,7 @@
 - 追加入力:
   - `bump` (choice): 次バージョンの上げ方（`patch` / `minor` / `major`）
 - 実行内容:
+  - 本番時に `NPM_TOKEN` の `npm whoami` を検証（`yuya296` 以外なら fail）
   - 現在の lockstep version 検証（必要なら `version` 入力と一致確認）
   - `node scripts/check-compatibility.mjs`（bump 前の core version で検証）
   - `bump` 入力に従って `packages/core/cm6-*` の `package.json` version を一括更新

@@ -57,6 +57,20 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify npm publish identity
+        if: inputs.dry_run == false
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          EXPECTED_NPM_USER: yuya296
+        run: |
+          ACTUAL_NPM_USER="$(npm whoami)"
+          echo "Authenticated npm user: ${ACTUAL_NPM_USER}"
+          if [ "${ACTUAL_NPM_USER}" != "${EXPECTED_NPM_USER}" ]; then
+            echo "NPM_TOKEN is authenticated as '${ACTUAL_NPM_USER}', expected '${EXPECTED_NPM_USER}'."
+            echo "Please update GitHub Secret NPM_TOKEN with a publish-capable token for ${EXPECTED_NPM_USER}."
+            exit 1
+          fi
+
       - name: Resolve current core version and enforce lockstep
         id: current_core_version
         env:
