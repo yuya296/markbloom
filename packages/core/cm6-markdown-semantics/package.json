@@ -38,14 +38,14 @@
     "@codemirror/lang-markdown": "^6.5.0",
     "@codemirror/language": "^6.12.1",
     "@codemirror/state": "^6.5.3",
-    "@codemirror/view": "^6.39.15",
+    "@codemirror/view": "^6.39.16",
     "@lezer/common": "^1.5.1"
   },
   "devDependencies": {
     "@codemirror/lang-markdown": "^6.5.0",
     "@codemirror/language": "^6.12.1",
     "@codemirror/state": "^6.5.3",
-    "@codemirror/view": "^6.39.15",
+    "@codemirror/view": "^6.39.16",
     "@lezer/common": "^1.5.1",
     "tsx": "^4.21.0",
     "tsup": "^8.5.1",
