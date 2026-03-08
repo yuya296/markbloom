@@ -59,17 +59,27 @@ export function setupApp() {
     throw new Error("Missing editor host element");
   }
 
-  return createEditor({
+  const applyStatus = (text: string, hasChanged: boolean) => {
+    if (status) {
+      status.textContent = `Length: ${text.length}`;
+    }
+    if (changeInfo) {
+      changeInfo.textContent = hasChanged
+        ? `Last change at ${new Date().toLocaleTimeString()}`
+        : "No changes yet.";
+    }
+  };
+
+  const handle = createEditor({
     parent: editorHost,
     initialText,
     extensions: buildExtensions(),
     onChange: (text) => {
-      if (status) {
-        status.textContent = `Length: ${text.length}`;
-      }
-      if (changeInfo) {
-        changeInfo.textContent = `Last change at ${new Date().toLocaleTimeString()}`;
-      }
+      applyStatus(text, true);
     },
   });
+
+  applyStatus(handle.getText(), false);
+
+  return handle;
 }
