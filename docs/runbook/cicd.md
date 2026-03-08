@@ -56,16 +56,18 @@
 - Trigger: 各 workflow の `workflow_dispatch`
 - 共通入力:
   - `dry_run` (boolean): 配布を dry-run にする
-  - `bump` (choice): 次バージョンの上げ方（`patch` / `minor` / `major`）
   - `version` (string, optional): 期待バージョンの一致チェック（各 workflow の定義に従う）
   - `create_release` (boolean): GitHub Release を作成する
 
 ### Core release
 - workflow: `.github/workflows/core-release.yml`
 - Node 実行バージョン: `24`
+- 追加入力:
+  - `bump` (choice): 次バージョンの上げ方（`patch` / `minor` / `major`）
 - 実行内容:
   - 現在の lockstep version 検証（必要なら `version` 入力と一致確認）
   - `bump` 入力に従って `packages/core/cm6-*` の `package.json` version を一括更新
+  - tag重複チェック（publish前）
   - `node scripts/check-compatibility.mjs`
   - npm での未公開チェック（dry-run / 本番の両方で実施）
   - `pnpm -r --filter "@yuya296/cm6-*" build`

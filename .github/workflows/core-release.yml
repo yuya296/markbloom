@@ -24,6 +24,10 @@ on:
         type: boolean
         default: true
 
+concurrency:
+  group: core-release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   publish:
     runs-on: ubuntu-latest
@@ -166,6 +170,16 @@ jobs:
         id: tag_name
         run: echo "value=core-v${{ steps.next_core_version.outputs.value }}" >> "$GITHUB_OUTPUT"
 
+      - name: Verify release tag does not exist
+        if: inputs.dry_run == false
+        run: |
+          TAG_NAME="${{ steps.tag_name.outputs.value }}"
+          git fetch --tags
+          if git tag -l "${TAG_NAME}" | grep -q "${TAG_NAME}"; then
+            echo "Tag already exists: ${TAG_NAME}"
+            exit 1
+          fi
+
       - name: Check compatibility matrix
         run: node scripts/check-compatibility.mjs
 
@@ -280,10 +294,6 @@ jobs:
         if: inputs.dry_run == false
         run: |
           TAG_NAME="${{ steps.tag_name.outputs.value }}"
-          if git tag -l "${TAG_NAME}" | grep -q "${TAG_NAME}"; then
-            echo "Tag already exists: ${TAG_NAME}"
-            exit 1
-          fi
           git tag "${TAG_NAME}"
           git push origin "${TAG_NAME}"
 
