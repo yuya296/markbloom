@@ -10,6 +10,7 @@ import {
 } from "../core/syntaxNodeNames";
 import { inlineElementConfigs, type InlineElementConfig } from "../config";
 import { isInlineRawByTriggers } from "./rawMode";
+import { parseMarkdownImageLiteral } from "./imageLiteral";
 
 const inlineConfigByNode = new Map(
   inlineElementConfigs.map((config) => [config.node, config])
@@ -331,15 +332,11 @@ export function collectInlineMarkerRanges(
 
       if ((!raw || options.imageRawShowsPreview) && node.name === NodeName.Image) {
         const literal = state.doc.sliceString(node.from, node.to);
-        const match = literal.match(/^!\[([^\]]*)\]\(([^)\s]+)(?:\s+"[^"]*")?\)$/);
-        if (!match) {
+        const parsed = parseMarkdownImageLiteral(literal);
+        if (!parsed) {
           return;
         }
-        const alt = match[1] ?? "";
-        const rawSrc = match[2] ?? "";
-        if (!rawSrc) {
-          return;
-        }
+        const { alt, rawSrc } = parsed;
         const shouldResolve =
           resolvedBase &&
           !/^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(rawSrc) &&

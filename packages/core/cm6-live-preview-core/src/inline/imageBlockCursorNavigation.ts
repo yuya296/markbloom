@@ -21,7 +21,7 @@ const imageBlockRangesField = StateField.define<
     return collectStandaloneImageBlocksFromState(state);
   },
   update(value, tr) {
-    if (!tr.docChanged) {
+    if (!tr.docChanged && !tr.reconfigured) {
       return value;
     }
     return collectStandaloneImageBlocksFromState(tr.state);
@@ -63,6 +63,13 @@ export function imageBlockCursorNavigation(): Extension {
         return;
       }
       if (update.transactions.some((tr) => tr.annotation(imageCursorAdjusted))) {
+        pendingDirection = null;
+        return;
+      }
+      if (
+        update.startState.selection.ranges.length !== 1 ||
+        update.state.selection.ranges.length !== 1
+      ) {
         pendingDirection = null;
         return;
       }

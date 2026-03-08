@@ -17,9 +17,13 @@ function createState(doc: string): EditorState {
 
 test("collects only standalone image lines for block navigation", () => {
   const state = createState(
-    ["before", "![standalone](a.png)", "text ![inline](b.png) tail", "   ![spaced](c.png)   "].join(
-      "\n"
-    )
+    [
+      "before",
+      "![standalone](a.png)",
+      "text ![inline](b.png) tail",
+      "   ![spaced](c.png)   ",
+      "![unsupported](d.png 'caption')",
+    ].join("\n")
   );
 
   const blocks = collectStandaloneImageBlocksFromState(state);

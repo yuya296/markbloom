@@ -2,6 +2,7 @@ import { syntaxTree } from "@codemirror/language";
 import type { EditorState } from "@codemirror/state";
 import type { Range } from "../core/types";
 import { NodeName } from "../core/syntaxNodeNames";
+import { parseMarkdownImageLiteral } from "./imageLiteral";
 
 export type ImageBlockInfo = {
   replaceRange: Range;
@@ -35,6 +36,10 @@ export function collectStandaloneImageBlocksFromState(
         return;
       }
       const replaceRange = { from: node.from, to: node.to };
+      const literal = state.doc.sliceString(node.from, node.to);
+      if (!parseMarkdownImageLiteral(literal)) {
+        return;
+      }
       if (!isStandaloneImageLine(state, replaceRange)) {
         return;
       }
