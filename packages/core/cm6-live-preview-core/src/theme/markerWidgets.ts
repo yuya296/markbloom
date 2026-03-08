@@ -1,62 +1,17 @@
 import { EditorState } from "@codemirror/state";
 import { Decoration, EditorView, WidgetType } from "@codemirror/view";
 
-// cm-widget-measure: static
-class MarkerWidget extends WidgetType {
-  constructor(private readonly text: string, private readonly className: string) {
-    super();
-  }
-
-  eq(other: MarkerWidget): boolean {
-    return this.text === other.text && this.className === other.className;
-  }
-
-  toDOM(): HTMLElement {
-    const span = document.createElement("span");
-    span.className = this.className;
-    span.textContent = this.text;
-    return span;
-  }
-}
-
-export function markerReplace(text: string, className: string): Decoration {
-  return Decoration.replace({
-    widget: new MarkerWidget(text, className),
-    inclusive: false,
-  });
-}
-
 type ListMarkerKind = "bullet" | "ordered";
 
-// cm-widget-measure: static
-class ListMarkerWidget extends WidgetType {
-  constructor(
-    private readonly text: string,
-    private readonly kind: ListMarkerKind
-  ) {
-    super();
-  }
-
-  eq(other: ListMarkerWidget): boolean {
-    return this.text === other.text && this.kind === other.kind;
-  }
-
-  toDOM(): HTMLElement {
-    const span = document.createElement("span");
-    span.className = `cm-lp-list-marker cm-lp-list-marker-${this.kind}`;
-    span.textContent = this.text;
-    return span;
-  }
-}
-
-export function listMarkerReplace(
+export function listMarkerDecoration(
   kind: ListMarkerKind,
   rawText: string
 ): Decoration {
-  const text = kind === "bullet" ? "\u2022" : rawText;
-  return Decoration.replace({
-    widget: new ListMarkerWidget(text, kind),
-    inclusive: false,
+  return Decoration.mark({
+    class: `cm-lp-list-marker cm-lp-list-marker-${kind}`,
+    attributes: {
+      "data-lp-raw-marker": rawText,
+    },
   });
 }
 
