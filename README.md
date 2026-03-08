@@ -43,6 +43,14 @@ MarkBloom is a VS Code extension for **reviewing and editing Markdown** in a way
 
 If Node is below the minimum version, `pnpm -C apps/webview-demo dev` fails early with a clear version error.
 
+## PM2 with Parallel Worktrees
+
+- Start with `pm2 start ecosystem.config.cjs --update-env`.
+- Process name is `webview-demo-<branch-slug>-<branch-hash6>`.
+- Dev port is derived deterministically from the branch name.
+- Override only when needed: `MB_PORT=<port> pm2 start ecosystem.config.cjs --update-env`.
+- Running multiple worktrees on the same branch at the same time is unsupported.
+
 ## Dependency model
 
 - App layer (`apps/*`) depends on core layer (`@yuya296/cm6-*`).

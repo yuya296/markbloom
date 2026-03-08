@@ -41,6 +41,14 @@ MarkBloom は、**Markdown を “真実のソース” のまま**、人間が 
 
 最小 Node バージョン未満では、`pnpm -C apps/webview-demo dev` 実行時にバージョン不足エラーで即時停止します。
 
+## PM2とworktree並行開発
+
+- `pm2 start ecosystem.config.cjs --update-env` で起動します。
+- プロセス名は `webview-demo-<branch-slug>-<branch-hash6>` です。
+- dev port は branch名から自動決定されます。
+- 競合時のみ `MB_PORT=<port> pm2 start ecosystem.config.cjs --update-env` で手動上書きできます。
+- 同一branchを複数worktreeで同時起動する運用は非対応です。
+
 ## 依存関係モデル
 
 - app 層（`apps/*`）は core 層（`@yuya296/cm6-*`）に依存します。

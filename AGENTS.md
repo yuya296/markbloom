@@ -37,7 +37,9 @@
 - 前提: Node.js `22+`（推奨: `.nvmrc` の `24.x`）
 - 初回セットアップ: `nvm use && corepack enable && pnpm install`
 - 起動: `pnpm -C apps/webview-demo dev`
-- PM2起動: `pm2 start ecosystem.config.cjs`
+- PM2起動: `pm2 start ecosystem.config.cjs --update-env`
+- PM2プロセス名: `webview-demo-<branch-slug>-<branch-hash6>`
+- PM2ポート: branch名から自動決定。必要時のみ `MB_PORT=<port> pm2 start ecosystem.config.cjs --update-env` で上書き
 - 主要Lint/型チェック: 各パッケージの`package.json`参照。
 
 ### Branch Naming
@@ -48,6 +50,7 @@
 
 ### Change Checklist (Keep It Short)
 - 機能変更: 影響パッケージの責務を確認し、該当モジュールに最小変更。
-- 作業後（毎回）: `pnpm -C apps/webview-demo build` と `pm2 start ecosystem.config.cjs` で確認。
+- 作業後（毎回）: `pnpm -C apps/webview-demo build` と `pm2 start ecosystem.config.cjs --update-env` で確認。
+- 並行開発: 同一branchを複数worktreeで同時起動しない（PM2識別子はbranch基準）。
 - UI/テーマ変更: `webview-demo`のCSS変数とテーマ拡張の両方を確認。
 - 検証: playwright-cliで動作確認すること。
