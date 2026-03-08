@@ -6,11 +6,14 @@
 - Domain/Glossaryに用語追加
 - Overview図が変わるなら更新
 - 実装着手時は`implement`スキル、ユーザ完了報告時は`dod`スキルを使用
+- `dod`スキルでDoD確認が完了するまで、ユーザへの完了報告を禁止（質問・確認は可）
 - GitHubでPRを作成し、以下をすべて確認
+  - `update branch` を実施済みであること
+  - `update branch` 後の内容をローカルに `git pull` して同期済みであること
   - レビュー指摘コメントにすべて対応していること
     - 対応不要なら理由を記載してResolve
     - 対応必要なら対応内容とcommit hashをコメントしてResolve
-  - CIが通っていること
+  - `update branch` 後の最新コミットでCIが通っていること
 
 ## Repository Overview (Quick Start)
 
