@@ -4,6 +4,7 @@ import { markdown } from "@codemirror/lang-markdown";
 import { EditorState } from "@codemirror/state";
 import { collectStandaloneImageBlocksFromState } from "../src/inline/imageBlocks";
 import {
+  resolveImageBlockAdjustedHead,
   shouldMoveCursorPastImageBottom,
   shouldMoveCursorToImageTop,
 } from "../src/inline/imageBlockNavigationLogic";
@@ -48,4 +49,19 @@ test("moves cursor past image bottom when down-navigation lands on boundary", ()
   const block = { replaceRange: { from: 10, to: 30 } };
   assert.equal(shouldMoveCursorPastImageBottom(10, 30, block), true);
   assert.equal(shouldMoveCursorPastImageBottom(31, 30, block), false);
+});
+
+test("resolves top adjustment when entering from above and start state is rich", () => {
+  const block = { replaceRange: { from: 10, to: 30 } };
+  assert.equal(resolveImageBlockAdjustedHead(5, 30, block, "down", false), 10);
+});
+
+test("skips image block adjustment when movement starts in raw mode", () => {
+  const block = { replaceRange: { from: 10, to: 30 } };
+  assert.equal(resolveImageBlockAdjustedHead(5, 30, block, "down", true), null);
+});
+
+test("resolves bottom adjustment when navigating down from inside block", () => {
+  const block = { replaceRange: { from: 10, to: 30 } };
+  assert.equal(resolveImageBlockAdjustedHead(10, 30, block, "down", false), 31);
 });

@@ -7,8 +7,7 @@ import {
   type ImageBlockInfo,
 } from "./imageBlocks";
 import {
-  shouldMoveCursorPastImageBottom,
-  shouldMoveCursorToImageTop,
+  resolveImageBlockAdjustedHead,
 } from "./imageBlockNavigationLogic";
 import { isInlineRawByTriggers } from "./rawMode";
 
@@ -94,35 +93,32 @@ export function imageBlockCursorNavigation(): Extension {
 
       const blocks = update.state.field(imageBlockRangesField);
       for (const block of blocks) {
-        // Raw mode keeps markdown editable, so cursor should move naturally.
-        if (isInlineRawByTriggers(update.state, block.replaceRange, imageRawModeTrigger)) {
+        const wasRawModeAtStart = isInlineRawByTriggers(
+          update.startState,
+          block.replaceRange,
+          imageRawModeTrigger
+        );
+        const adjustedHead = resolveImageBlockAdjustedHead(
+          prevHead,
+          currentHead,
+          block,
+          pendingDirection,
+          wasRawModeAtStart
+        );
+        if (adjustedHead === null) {
           continue;
         }
-        if (pendingDirection !== "down") {
+        const nextHead = Math.min(adjustedHead, update.state.doc.length);
+        if (nextHead === currentHead) {
           continue;
         }
-        if (shouldMoveCursorToImageTop(prevHead, currentHead, block)) {
-          pendingDirection = null;
-          update.view.dispatch({
-            selection: { anchor: block.replaceRange.from },
-            annotations: imageCursorAdjusted.of(true),
-            scrollIntoView: true,
-          });
-          return;
-        }
-        if (shouldMoveCursorPastImageBottom(prevHead, currentHead, block)) {
-          const nextHead = Math.min(block.replaceRange.to + 1, update.state.doc.length);
-          if (nextHead === currentHead) {
-            continue;
-          }
-          pendingDirection = null;
-          update.view.dispatch({
-            selection: { anchor: nextHead },
-            annotations: imageCursorAdjusted.of(true),
-            scrollIntoView: true,
-          });
-          return;
-        }
+        pendingDirection = null;
+        update.view.dispatch({
+          selection: { anchor: nextHead },
+          annotations: imageCursorAdjusted.of(true),
+          scrollIntoView: true,
+        });
+        return;
       }
 
       pendingDirection = null;
