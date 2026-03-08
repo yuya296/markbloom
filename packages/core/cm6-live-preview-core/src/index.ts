@@ -26,6 +26,8 @@ export function livePreviewBaseTheme(): Extension {
       overflow: "hidden",
       whiteSpace: "pre",
       verticalAlign: "baseline",
+      fontSize: "0",
+      lineHeight: "0",
     },
     ".cm-content .cm-lp-image": {
       display: "inline-block",
