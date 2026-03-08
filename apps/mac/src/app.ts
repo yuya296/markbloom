@@ -113,6 +113,7 @@ export function setupApp() {
       if (typeof selected !== "string") {
         return;
       }
+      await invoke("allow_markdown_path", { path: selected });
       const text = await invoke<string>("read_markdown_file", { path: selected });
       currentFilePath = selected;
       resetBaseline(text);
@@ -141,6 +142,7 @@ export function setupApp() {
         targetPath = selected;
       }
       const text = handle.getText();
+      await invoke("allow_markdown_path", { path: targetPath });
       await invoke("write_markdown_file", { path: targetPath, content: text });
       currentFilePath = targetPath;
       resetBaseline(text);

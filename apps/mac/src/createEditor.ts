@@ -1,5 +1,6 @@
 import { EditorState, Compartment, type Extension, Prec } from "@codemirror/state";
 import { EditorView, keymap } from "@codemirror/view";
+import { invoke } from "@tauri-apps/api/core";
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
 import { markdown } from "@codemirror/lang-markdown";
 import { languages } from "@codemirror/language-data";
@@ -119,7 +120,12 @@ export function createEditor({
 
         event.preventDefault();
         event.stopPropagation();
-        window.open(href, "_blank", "noopener,noreferrer");
+        if (!/^https?:\/\//iu.test(href)) {
+          return true;
+        }
+        void invoke("open_external_url", { url: href }).catch((error) => {
+          console.error("Failed to open external url", error);
+        });
         return true;
       },
     }),
