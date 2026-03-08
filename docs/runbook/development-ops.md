@@ -26,7 +26,8 @@
   - `core`（`@yuya296/cm6-*`）: lockstep 運用
   - `vscode`（`markbloom`）: 独立運用
   - `mac`（`apps/mac`）: 独立運用（現状は `0.1.x`）
-- リリース時にのみ `package.json` を更新
+- `core` は release workflow 内で `bump` 入力により `package.json` を更新する
+- `vscode` / `mac` は必要時に手動で `package.json` を更新する
 - 未デプロイの変更は Git 履歴で管理
 
 ## タグ運用
@@ -41,8 +42,9 @@
    - `pnpm -r build`
    - `pnpm -r --if-present test`
    - `node scripts/check-compatibility.mjs`
-2) バージョン更新
-   - 対象 release line の `package.json` `version` を更新
+2) version 戦略を決める
+   - core: workflow 実行時に `bump`（`patch` / `minor` / `major`）を指定
+   - vscode / mac: 対象 release line の `package.json` `version` を更新
 3) Actions で対象 workflow を手動実行
    - core: `.github/workflows/core-release.yml`
    - vscode: `.github/workflows/vscode-release.yml`
@@ -54,7 +56,9 @@
 ## Core release 補足
 - `@yuya296/cm6-*` は全パッケージ同時リリース
 - lockstep が崩れている場合は workflow が停止する
-- 公開前に npm 上の同version重複を検知して停止する
+- dry-run / 本番の両方で npm 上の同version重複を検知して停止する
+- 本番時は publish 前に version 更新commitを push する
+- dry-run 時は一時更新した version を workflow 終了時に復元する
 
 ## VS Code release 補足
 - `VSCE_PAT` を使って Marketplace へ公開する

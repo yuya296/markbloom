@@ -7,8 +7,16 @@ on:
         description: "Run publish as dry-run"
         type: boolean
         default: false
+      bump:
+        description: "SemVer bump type for lockstep core version"
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+        default: patch
       version:
-        description: "Expected lockstep core version (optional)"
+        description: "Expected current lockstep core version before bump (optional)"
         required: false
         type: string
       create_release:
@@ -22,11 +30,13 @@ jobs:
     permissions:
       contents: write
     outputs:
-      core_version: ${{ steps.core_version.outputs.value }}
+      core_version: ${{ steps.next_core_version.outputs.value }}
       tag_name: ${{ steps.tag_name.outputs.value }}
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v6
@@ -43,8 +53,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Resolve core version and enforce lockstep
-        id: core_version
+      - name: Resolve current core version and enforce lockstep
+        id: current_core_version
         env:
           INPUT_VERSION: ${{ inputs.version }}
         run: |
@@ -77,31 +87,91 @@ jobs:
             process.exit(1);
           }
 
-          const resolved = uniqueVersions[0];
+          const current = uniqueVersions[0];
           const requested = process.env.INPUT_VERSION?.trim();
-          if (requested && requested !== resolved) {
-            console.error(`Input version (${requested}) does not match lockstep version (${resolved}).`);
+          if (requested && requested !== current) {
+            console.error(`Input version (${requested}) does not match lockstep version (${current}).`);
             process.exit(1);
           }
 
           require("node:fs").appendFileSync(
             process.env.GITHUB_OUTPUT,
-            `value=${resolved}\n`,
+            `value=${current}\n`,
           );
-          console.log(`Resolved core version: ${resolved}`);
+          console.log(`Resolved current core version: ${current}`);
+          NODE
+
+      - name: Determine next core version
+        id: next_core_version
+        env:
+          CURRENT_VERSION: ${{ steps.current_core_version.outputs.value }}
+          INPUT_BUMP: ${{ inputs.bump }}
+        run: |
+          node <<'NODE'
+          const { appendFileSync } = require("node:fs");
+
+          const current = process.env.CURRENT_VERSION;
+          const bump = process.env.INPUT_BUMP;
+          const match = current.match(/^(\d+)\.(\d+)\.(\d+)(?:-.+)?$/);
+          if (!match) {
+            console.error(`Current version is not a valid SemVer core: ${current}`);
+            process.exit(1);
+          }
+
+          const major = Number(match[1]);
+          const minor = Number(match[2]);
+          const patch = Number(match[3]);
+          let next;
+
+          if (bump === "major") {
+            next = `${major + 1}.0.0`;
+          } else if (bump === "minor") {
+            next = `${major}.${minor + 1}.0`;
+          } else if (bump === "patch") {
+            next = `${major}.${minor}.${patch + 1}`;
+          } else {
+            console.error(`Unsupported bump type: ${bump}`);
+            process.exit(1);
+          }
+
+          appendFileSync(process.env.GITHUB_OUTPUT, `value=${next}\n`);
+          console.log(`Next core version: ${next} (bump=${bump})`);
+          NODE
+
+      - name: Bump core packages to next lockstep version
+        env:
+          NEXT_VERSION: ${{ steps.next_core_version.outputs.value }}
+        run: |
+          node <<'NODE'
+          const { existsSync, readFileSync, readdirSync, writeFileSync } = require("node:fs");
+          const { join } = require("node:path");
+
+          const next = process.env.NEXT_VERSION;
+          const packagesDir = "packages/core";
+          const packageDirs = readdirSync(packagesDir, { withFileTypes: true })
+            .filter((dirent) => dirent.isDirectory() && dirent.name.startsWith("cm6-"))
+            .map((dirent) => join(packagesDir, dirent.name))
+            .filter((dir) => existsSync(join(dir, "package.json")));
+
+          for (const dir of packageDirs) {
+            const pkgPath = join(dir, "package.json");
+            const pkg = JSON.parse(readFileSync(pkgPath, "utf8"));
+            pkg.version = next;
+            writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`);
+            console.log(`Updated ${pkg.name} -> ${next}`);
+          }
           NODE
 
       - name: Set core tag name
         id: tag_name
-        run: echo "value=core-v${{ steps.core_version.outputs.value }}" >> "$GITHUB_OUTPUT"
+        run: echo "value=core-v${{ steps.next_core_version.outputs.value }}" >> "$GITHUB_OUTPUT"
 
       - name: Check compatibility matrix
         run: node scripts/check-compatibility.mjs
 
       - name: Verify versions are unpublished
-        if: inputs.dry_run == false
         env:
-          CORE_VERSION: ${{ steps.core_version.outputs.value }}
+          CORE_VERSION: ${{ steps.next_core_version.outputs.value }}
         run: |
           node -e '
           const { execSync } = require("node:child_process");
@@ -151,6 +221,21 @@ jobs:
       - name: Build core packages
         run: pnpm -r --filter "@yuya296/cm6-*" build
 
+      - name: Commit and push bumped core versions
+        if: inputs.dry_run == false
+        env:
+          NEXT_VERSION: ${{ steps.next_core_version.outputs.value }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add packages/core/cm6-*/package.json
+          if git diff --cached --quiet; then
+            echo "No core package version changes to commit."
+            exit 1
+          fi
+          git commit -m "chore(release): bump core packages to ${NEXT_VERSION}"
+          git push origin "HEAD:${{ github.ref_name }}"
+
       - name: Publish core packages
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -187,6 +272,10 @@ jobs:
             sed 's/^/- /' .core-published-packages.txt
           } >> .core-release-notes.md
 
+      - name: Restore core package versions after dry-run
+        if: always() && inputs.dry_run == true
+        run: git checkout -- packages/core/cm6-*/package.json
+
       - name: Create git tag
         if: inputs.dry_run == false
         run: |
@@ -203,5 +292,5 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.tag_name.outputs.value }}
-          name: Core Release v${{ steps.core_version.outputs.value }}
+          name: Core Release v${{ steps.next_core_version.outputs.value }}
           body_path: .core-release-notes.md
