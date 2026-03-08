@@ -94,7 +94,7 @@ importers:
         version: 1.97.3
       vite:
         specifier: ^7.3.0
-        version: 7.3.0(@types/node@24.10.7)(sass@1.97.3)(tsx@4.21.0)
+        version: 7.3.0(@types/node@25.3.3)(sass@1.97.3)(tsx@4.21.0)
 
   apps/vscode-extension:
     dependencies:
