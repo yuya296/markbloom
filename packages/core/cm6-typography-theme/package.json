@@ -36,11 +36,11 @@
   },
   "peerDependencies": {
     "@codemirror/state": "^6.5.3",
-    "@codemirror/view": "^6.39.15"
+    "@codemirror/view": "^6.39.16"
   },
   "devDependencies": {
     "@codemirror/state": "^6.5.3",
-    "@codemirror/view": "^6.39.15",
+    "@codemirror/view": "^6.39.16",
     "tsx": "^4.21.0",
     "tsup": "^8.5.1",
     "typescript": "^5.9.3"
