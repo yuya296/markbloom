@@ -35,11 +35,11 @@
     "test": "tsx --test tests/*.test.ts"
   },
   "peerDependencies": {
-    "@codemirror/state": "^6.5.3",
+    "@codemirror/state": "^6.5.4",
     "@codemirror/view": "^6.39.15"
   },
   "devDependencies": {
-    "@codemirror/state": "^6.5.3",
+    "@codemirror/state": "^6.5.4",
     "@codemirror/view": "^6.39.15",
     "tsx": "^4.21.0",
     "tsup": "^8.5.1",
