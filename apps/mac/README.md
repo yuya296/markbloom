@@ -6,6 +6,20 @@ MarkBloom の mac ネイティブアプリ（Tauri 2）です。
 
 - Markdown のローカルファイルを開く（Open）
 - 編集内容をローカルファイルへ保存（Save）
+- 新規ファイルを作成（New File）
+- 検索/置換パネルを開く（Find / Replace）
+- 設定パネルを開く（Settings: Line wrapping）
+- Undo / Redo
+
+## Shortcuts (macOS)
+
+- `Cmd+O`: Open file
+- `Cmd+S`: Save file
+- `Cmd+N`: New file
+- `Cmd+F`: Find / Replace
+- `Cmd+.`: Settings
+- `Cmd+Z`: Undo
+- `Cmd+Shift+Z`: Redo
 
 ## Development
 

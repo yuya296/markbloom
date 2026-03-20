@@ -11,6 +11,24 @@
         <div class="toolbar-actions">
           <button id="open-file" type="button">Open</button>
           <button id="save-file" type="button">Save</button>
+          <div class="settings-menu">
+            <button
+              id="settings-toggle"
+              type="button"
+              aria-label="Open settings"
+              aria-haspopup="dialog"
+              aria-controls="settings-panel"
+              aria-expanded="false"
+            >
+              Settings
+            </button>
+            <div id="settings-panel" class="settings-panel" role="dialog" aria-label="Editor settings" hidden>
+              <label class="settings-item">
+                <input id="toggle-wrap-lines" type="checkbox" checked />
+                Line wrapping
+              </label>
+            </div>
+          </div>
         </div>
       </header>
       <main>

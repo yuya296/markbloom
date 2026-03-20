@@ -53,6 +53,8 @@
 - App Package: `apps/` 配下の実行可能プロダクト単位（例: webview-demo / vscode-extension / mac）。
 - Tauri App: Rust backend + WebView frontend で構成するデスクトップアプリ。MarkBloom では `apps/mac` を指す。
 - Tauri Capability: Tauri 2 で window ごとの操作許可を定義する権限制御ファイル。
+- App Menu Command: macOS のアプリメニューバーから実行される操作コマンド。MarkBloom mac では Open/Save/New/Find/Settings/Undo/Redo を指す。
+- Dirty State (mac): `apps/mac` で baseline と現在テキストが不一致の編集状態。Open/New 実行時に確認ダイアログの判定に使う。
 - mac App Bundle: macOS で配布する `.app` 形式の成果物。
 - Core Package: `packages/core/` 配下の共有ライブラリ単位（`@yuya296/cm6-*`）。
 - Diff Gutter: ベーステキストとの差分を行頭ガターのマーカーで表示する CM6 拡張。

@@ -78,6 +78,36 @@ body {
   gap: 8px;
 }
 
+.settings-menu {
+  position: relative;
+}
+
+.settings-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 180px;
+  padding: 10px;
+  border: 1px solid var(--app-border);
+  border-radius: 10px;
+  background: var(--app-surface);
+  box-shadow: 0 10px 20px rgba(31, 30, 28, 0.12);
+  z-index: 10;
+}
+
+.settings-panel[hidden] {
+  display: none;
+}
+
+.settings-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--app-text);
+  user-select: none;
+}
+
 .toolbar button {
   border: 1px solid var(--app-border);
   background: var(--app-surface);

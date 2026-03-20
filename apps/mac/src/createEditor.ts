@@ -2,6 +2,7 @@ import { EditorState, Compartment, type Extension, Prec } from "@codemirror/stat
 import { EditorView, keymap } from "@codemirror/view";
 import { invoke } from "@tauri-apps/api/core";
 import { defaultKeymap, history, historyKeymap } from "@codemirror/commands";
+import { search, searchKeymap } from "@codemirror/search";
 import { markdown } from "@codemirror/lang-markdown";
 import { languages } from "@codemirror/language-data";
 import { GFM, Strikethrough } from "@lezer/markdown";
@@ -136,7 +137,8 @@ export function createEditor({
       },
     }),
     Prec.high(markdownSmartBol({ shortcuts: getDefaultSmartBolShortcuts() })),
-    keymap.of([...historyKeymap, ...defaultKeymap]),
+    search({ top: true }),
+    keymap.of([...historyKeymap, ...searchKeymap, ...defaultKeymap]),
     markdown({
       extensions: [Strikethrough, GFM],
       codeLanguages: languages,
