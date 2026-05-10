@@ -35,7 +35,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@lezer/common": "^1.5.1"
+    "@lezer/common": "^1.5.2"
   },
   "peerDependencies": {
     "@codemirror/language": "^6.12.1",
