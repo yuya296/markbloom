@@ -35,7 +35,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "mermaid": "^11.12.3",
+    "mermaid": "^11.15.0",
     "type-fest": "^4.41.0"
   },
   "peerDependencies": {
